@@ -49,6 +49,6 @@ Detalhes em [`docs/planos.md`](docs/planos.md).
 - [x] Fase 0: estrutura do repositório
 - [x] Fase 1: dados
 - [x] Fase 2: dashboard em HTML publicado no GitHub Pages, lendo a aba `ordens` ao vivo
-- [ ] Fase 3: cálculo com n8n
+- [x] Fase 3: cálculo com n8n (`n8n/workflow.json`)
 - [ ] Fase 4: cálculo com Make
 - [ ] Fase 5: notificação com Zapier

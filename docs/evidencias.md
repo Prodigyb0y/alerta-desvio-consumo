@@ -12,3 +12,9 @@ Planos conferidos nos painéis de Make, Zapier e n8n. Detalhes em [`planos.md`](
 - Página em HTML publicada no GitHub Pages (pasta `docs/`, branch `main`): https://prodigyb0y.github.io/alerta-desvio-consumo/
 - A página lê a aba `ordens` publicada como CSV. Rodapé confirmado como "Fonte: Google Sheets ao vivo", com 200 ordens e 149 com pendência, iguais à referência em Python.
 - Decisão de usar HTML no lugar do Looker Studio: [`decisoes.md`](decisoes.md).
+
+## Fase 3: cálculo com n8n (18/11/2026)
+- Fluxo: gatilho manual → Google Sheets (ler linhas de `ordens`) → Filter (`qtd_pendente_calc` > 0) → Aggregate → Code → Google Sheets (append em `resumo`, `ferramenta` = "N8N"). Sem nó de Gmail: o e-mail é do Zapier.
+- Exportado sem alterações em [`n8n/workflow.json`](../n8n/workflow.json) (fluxo inativo, só execução manual).
+- Resultado gravado em `resumo`: total_pendentes 149, soma_pendente 7.981, top 5 = Válvula solenoide (1205), Vedação de borracha (966), Mancal de apoio (904), Parafuso M8 (863), Rolamento 6204 (737). Igual à referência em Python.
+- O código do nó Code foi reexecutado fora do n8n sobre `dados/ordens.csv` e deu o mesmo resultado.

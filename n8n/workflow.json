@@ -1,0 +1,286 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "38fb67ff-87cb-4a94-80c8-fd9c1cf36647",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1aa9nC38FfzIfxB_XO5EZ-vu2mEZKRQ5ii36v0QJ50jA",
+          "mode": "list",
+          "cachedResultName": "alerta-desvio-consumo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1aa9nC38FfzIfxB_XO5EZ-vu2mEZKRQ5ii36v0QJ50jA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 880285063,
+          "mode": "list",
+          "cachedResultName": "ordens",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1aa9nC38FfzIfxB_XO5EZ-vu2mEZKRQ5ii36v0QJ50jA/edit#gid=880285063"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "564cb87a-8b84-4145-9f9f-bfb947459b33",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VqcshrCH6d0RANoe",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "c6b45890-4332-469a-99f8-824bc32cc729",
+              "leftValue": "={{ $json.qtd_pendente_calc }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.4,
+      "position": [
+        448,
+        0
+      ],
+      "id": "4975dd86-f031-450e-9508-6b7c0a40a9f4",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "ordens",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        672,
+        0
+      ],
+      "id": "8b594a43-0b33-4296-9b02-37bf98507573",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "const itens = $input.first().json.ordens;\nconst porComponente = {};\nlet soma = 0;\n\nfor (const o of itens) {\n  const p = Number(o.qtd_pendente_calc);\n  soma += p;\n  porComponente[o.componente] = (porComponente[o.componente] || 0) + p;\n}\n\nconst top5 = Object.entries(porComponente)\n  .sort((a, b) => b[1] - a[1])\n  .slice(0, 5)\n  .map(([c, v]) => `${c} (${v})`)\n  .join('; ');\n\nreturn [{\n  json: {\n    data_execucao: new Date().toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' }),\n    ferramenta: 'N8N',\n    total_pendentes: itens.length,\n    soma_pendente: soma,\n    top5_componentes: top5,\n    link_dashboard: 'https://prodigyb0y.github.io/alerta-desvio-consumo/'\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        0
+      ],
+      "id": "c8e190fc-2df0-4f9a-8ae6-8441e3b9a4a6",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1aa9nC38FfzIfxB_XO5EZ-vu2mEZKRQ5ii36v0QJ50jA",
+          "mode": "list",
+          "cachedResultName": "alerta-desvio-consumo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1aa9nC38FfzIfxB_XO5EZ-vu2mEZKRQ5ii36v0QJ50jA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 429567693,
+          "mode": "list",
+          "cachedResultName": "resumo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1aa9nC38FfzIfxB_XO5EZ-vu2mEZKRQ5ii36v0QJ50jA/edit#gid=429567693"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "data_execucao",
+              "displayName": "data_execucao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ferramenta",
+              "displayName": "ferramenta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "total_pendentes",
+              "displayName": "total_pendentes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "soma_pendente",
+              "displayName": "soma_pendente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "top5_componentes",
+              "displayName": "top5_componentes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "link_dashboard",
+              "displayName": "link_dashboard",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1024,
+        0
+      ],
+      "id": "2a5f666d-38ce-4d9d-bed7-7bff9d23f9ec",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VqcshrCH6d0RANoe",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "844da331-4216-42d4-8e39-51f440eef0a7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1bb3ad7987dd9f9dea8f615c596026b98bae71e8494ed55d0aa98ecb18e2112e"
+  },
+  "nodeGroups": [],
+  "id": "Z2ddORXFtNB5fdEc",
+  "tags": []
+}
