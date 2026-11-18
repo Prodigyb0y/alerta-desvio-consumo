@@ -19,3 +19,11 @@ Planos conferidos nos painéis de Make, Zapier e n8n. Detalhes em [`planos.md`](
 - Resultado gravado em `resumo`: total_pendentes 149, soma_pendente 7.981, top 5 = Válvula solenoide (1205), Vedação de borracha (966), Mancal de apoio (904), Parafuso M8 (863), Rolamento 6204 (737). Igual à referência em Python.
 - O código do nó Code foi reexecutado fora do n8n sobre `dados/ordens.csv` e deu o mesmo resultado.
 - Ajuste posterior: `data_execucao` passou a sair como `dd/mm/aaaa hh:mm:ss` (fuso America/Sao_Paulo). Execução de conferência gravou `18/11/2026 20:07:31 | N8N | 149 | 7981` com o mesmo top 5. O `n8n/workflow.json` reflete esse código.
+
+## Fase 4: cálculo com Make (18/11/2026)
+- Cenário `alerta-desvio-consumo` (Search Rows → Array aggregator com filtro `qtd_pendente_calc` > 0 → Iterator → Array aggregator → Add a Row em `resumo`). Detalhes e como importar: [`make/README.md`](../make/README.md).
+- Gatilho manual e cenário inativo. O n8n permanece inativo.
+- Execução bem-sucedida gravou em `resumo`: `18/11/2026 20:45:21 | MAKE | 149 | 7981 | Válvula solenoide (1205); Vedação de borracha (966); Mancal de apoio (904); Parafuso M8 (863); Rolamento 6204 (737)`. Igual à referência em Python e à linha do n8n.
+- Consumo da execução: 5 operações (5 créditos).
+- Correção feita no caminho: o filtro tinha sido salvo com o texto `qtd_pendente_calc` e operador de tempo, e por isso não bloqueava nenhuma linha. Foi refeito com a coluna H e operador numérico.
+- `make/blueprint.json` foi montado a partir da configuração aplicada no cenário e pode diferir em metadados do que o botão "Export Blueprint" gera.

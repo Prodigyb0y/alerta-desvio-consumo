@@ -1,0 +1,81 @@
+{
+  "name": "alerta-desvio-consumo",
+  "metadata": {
+    "instant": false,
+    "version": 1,
+    "scenario": { "roundtrips": 1, "maxErrors": 3, "autoCommit": true, "sequential": false, "confidential": false, "dataloss": false, "dlq": false, "freshVariables": false, "autoCommitTriggerLast": true }
+  },
+  "flow": [
+    {
+      "id": 1,
+      "module": "google-sheets:filterRows",
+      "version": 2,
+      "parameters": { "__IMTCONN__": 12423473 },
+      "mapper": {
+        "from": "drive",
+        "spreadsheetId": "1aa9nC38FfzIfxB_XO5EZ-vu2mEZKRQ5ii36v0QJ50jA",
+        "sheetId": "ordens",
+        "includesHeaders": true,
+        "tableFirstRow": "A1:Z1",
+        "limit": "300",
+        "sortOrder": "asc",
+        "valueRenderOption": "FORMATTED_VALUE",
+        "dateTimeRenderOption": "FORMATTED_STRING"
+      }
+    },
+    {
+      "id": 3,
+      "module": "builtin:BasicAggregator",
+      "version": 1,
+      "filter": {
+        "name": "pendente > 0",
+        "conditions": [[{ "a": "{{1.`7`}}", "b": "0", "o": "number:greater" }]]
+      },
+      "parameters": { "feeder": 1 },
+      "mapper": { "2": "{{1.`2`}}", "7": "{{1.`7`}}" }
+    },
+    {
+      "id": 4,
+      "module": "builtin:BasicFeeder",
+      "version": 1,
+      "parameters": {},
+      "mapper": { "array": "{{distinct(map(3.array; 2))}}" }
+    },
+    {
+      "id": 5,
+      "module": "builtin:BasicAggregator",
+      "version": 1,
+      "parameters": { "feeder": 4, "target": 587395 },
+      "mapper": {
+        "componente": "{{4.value}}",
+        "soma": "{{sum(map(3.array; 7; 2; 4.value))}}",
+        "texto": "{{4.value}} ({{sum(map(3.array; 7; 2; 4.value))}})"
+      }
+    },
+    {
+      "id": 6,
+      "module": "google-sheets:addRow",
+      "version": 2,
+      "parameters": { "__IMTCONN__": 12423473 },
+      "mapper": {
+        "mode": "select",
+        "from": "drive",
+        "spreadsheetId": "1aa9nC38FfzIfxB_XO5EZ-vu2mEZKRQ5ii36v0QJ50jA",
+        "sheetId": "resumo",
+        "includesHeaders": true,
+        "useColumnHeaders": false,
+        "insertUnformatted": false,
+        "valueInputOption": "USER_ENTERED",
+        "insertDataOption": "INSERT_ROWS",
+        "values": {
+          "0": "{{formatDate(now; \"DD/MM/YYYY HH:mm:ss\"; \"America/Sao_Paulo\")}}",
+          "1": "MAKE",
+          "2": "{{length(3.array)}}",
+          "3": "{{sum(map(3.array; 7))}}",
+          "4": "{{join(map(slice(reverse(sort(5.array; \"soma\")); 0; 5); \"texto\"); \"; \")}}",
+          "5": "https://prodigyb0y.github.io/alerta-desvio-consumo/"
+        }
+      }
+    }
+  ]
+}
