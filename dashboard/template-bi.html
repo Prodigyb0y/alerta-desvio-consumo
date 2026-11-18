@@ -141,6 +141,20 @@ tbody tr:hover{background:rgba(127,127,127,.07)}
 .pager .btn[disabled]{opacity:.4;cursor:default}
 table.tv{font-size:12px}
 
+/* manual (pop-up) */
+dialog#help{width:min(680px,calc(100vw - 32px));max-height:calc(100vh - 48px);padding:0;border:1px solid var(--axis);border-radius:12px;background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+dialog#help::backdrop{background:rgba(0,0,0,.55)}
+.hbox{display:flex;flex-direction:column;max-height:calc(100vh - 48px)}
+.hhead{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--grid)}
+.hhead h2{margin:0;font-size:16px;font-weight:600}
+.hbody{padding:6px 18px 18px;overflow-y:auto;font-size:13px;color:var(--ink2)}
+.hbody h3{font-size:13px;font-weight:600;color:var(--ink);margin:16px 0 4px}
+.hbody p{margin:4px 0}
+.hbody ul{margin:4px 0;padding-left:18px}
+.hbody li{margin:3px 0}
+.hbody b{color:var(--ink);font-weight:600}
+.hbody .eq{display:inline-block;padding:1px 6px;border-radius:4px;background:var(--empty);color:var(--ink)}
+
 /* tooltip */
 .tip{position:fixed;z-index:50;left:0;top:0;pointer-events:none;background:var(--surface);border:1px solid var(--axis);border-radius:8px;padding:8px 10px;box-shadow:var(--shadow);font-size:12px;max-width:260px;opacity:0;transition:opacity .1s}
 .t-title{color:var(--ink2);margin-bottom:4px}
@@ -173,6 +187,7 @@ footer{margin-top:20px;font-size:12px;color:var(--ink2);display:flex;flex-wrap:w
     </div>
     <div class="tools">
       <button class="btn" id="refreshBtn" hidden>Atualizar dados</button>
+      <button class="btn" id="helpBtn" aria-haspopup="dialog">Como usar</button>
       <button class="btn" id="themeBtn" aria-label="Alternar tema claro e escuro">Tema</button>
     </div>
   </div>
@@ -227,6 +242,67 @@ footer{margin-top:20px;font-size:12px;color:var(--ink2);display:flex;flex-wrap:w
     <span>Dados fictícios gerados por scripts/gerar_dados.py (seed 42).</span>
   </footer>
 </div>
+<dialog id="help" aria-labelledby="helpTitle">
+  <div class="hbox">
+    <div class="hhead"><h2 id="helpTitle">Como usar este dashboard</h2><button class="btn" id="helpClose" aria-label="Fechar o manual">Fechar</button></div>
+    <div class="hbody">
+      <p>Este painel mostra quais ordens de produção ainda têm componentes a consumir e onde essas pendências se concentram. Tudo na tela responde aos mesmos filtros, então os números sempre concordam entre si.</p>
+
+      <h3>O que é pendência</h3>
+      <p><span class="eq">pendência = quantidade necessária − quantidade consumida</span></p>
+      <ul>
+        <li><b>Pendente:</b> maior que zero. Falta consumir material. É o que o painel soma e destaca.</li>
+        <li><b>Zerada:</b> igual a zero. O consumo bateu com o necessário.</li>
+        <li><b>Excedente:</b> menor que zero. Foi consumido mais do que o previsto.</li>
+      </ul>
+
+      <h3>Indicadores no topo</h3>
+      <ul>
+        <li><b>Ordens com pendência:</b> quantas ordens ainda têm algo a consumir, e a parcela do recorte.</li>
+        <li><b>Soma pendente:</b> total de unidades a consumir, com a média por ordem pendente.</li>
+        <li><b>Maior pendência:</b> a ordem com mais unidades em falta.</li>
+        <li><b>Consumo vs. necessário:</b> quanto do previsto já foi consumido, em porcentagem.</li>
+        <li><b>Consumo acima do necessário:</b> quantas ordens passaram do previsto e quantas unidades a mais.</li>
+      </ul>
+
+      <h3>Filtros</h3>
+      <ul>
+        <li><b>Área:</b> clique em uma ou mais áreas para ligar e desligar.</li>
+        <li><b>Componente e Situação:</b> escolha na lista.</li>
+        <li><b>Pendência mínima:</b> mostra só ordens com pelo menos essa quantidade pendente. Serve como limite de alerta.</li>
+        <li><b>Buscar ordem:</b> digite parte do código, por exemplo OP-0075.</li>
+        <li><b>Limpar filtros</b> volta ao estado inicial. Os filtros ativos aparecem como etiquetas, e o × em cada uma remove só aquele filtro.</li>
+      </ul>
+
+      <h3>Gráficos</h3>
+      <ul>
+        <li><b>Clicar filtra.</b> Clique numa barra, numa faixa ou numa célula do mapa de calor para filtrar tudo. Clique de novo para remover.</li>
+        <li><b>Top 10 componentes:</b> os componentes com mais unidades pendentes. O número fica na ponta da barra.</li>
+        <li><b>Pendência por área:</b> mostra qual área concentra mais pendência.</li>
+        <li><b>Faixas de pendência:</b> conta ordens pendentes por tamanho da pendência (1–25, 26–50, 51–100 e 101+ unidades). Quanto mais escura a coluna, maior a faixa.</li>
+        <li><b>Mapa de calor:</b> cruza área e componente. Quanto mais forte a cor, mais pendência (a escala embaixo vai de 0 ao máximo, nos dois temas). Os números aparecem nas três maiores células e nos totais. Nos demais, passe o mouse.</li>
+        <li><b>Ver tabela:</b> cada gráfico tem um botão que troca o desenho pelos mesmos números em tabela.</li>
+      </ul>
+
+      <h3>Tabela de ordens</h3>
+      <ul>
+        <li>Clique no título de uma coluna para ordenar. Clique de novo para inverter.</li>
+        <li><b>Baixar CSV do recorte</b> exporta exatamente as ordens que estão filtradas.</li>
+      </ul>
+
+      <h3>Dicas</h3>
+      <ul>
+        <li>Passe o mouse (ou use Tab) sobre qualquer barra ou célula para ver os detalhes.</li>
+        <li>Com o teclado, Enter ou Espaço ativam o filtro do item selecionado.</li>
+        <li>O botão <b>Tema</b> alterna entre claro e escuro.</li>
+        <li>O endereço da página guarda os filtros, então dá para copiar o link do recorte que você está vendo.</li>
+      </ul>
+
+      <h3>Sobre os dados</h3>
+      <p>São dados fictícios da empresa Gutenberg Systems, gerados por script. A página usa um retrato dos dados embutido nela, por isso funciona sem instalar nada.</p>
+    </div>
+  </div>
+</dialog>
 <div class="tip" id="tip" role="tooltip"></div>
 
 <script>
@@ -304,6 +380,12 @@ $('#themeBtn').addEventListener('click', ()=>{
 });
 try { const t=localStorage.getItem('adc-theme'); if (t) document.documentElement.dataset.theme=t; } catch(e){}
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>render());
+
+/* ===== Manual em pop-up ===== */
+const help=$('#help');
+$('#helpBtn').addEventListener('click',()=>{ hideTip(); if (help.showModal) help.showModal(); else help.setAttribute('open',''); });
+$('#helpClose').addEventListener('click',()=>help.close());
+help.addEventListener('click',e=>{ if (e.target===help) help.close(); });
 
 /* ===== Tooltip (um só, texto sempre via textContent) ===== */
 const tip = $('#tip');
@@ -526,10 +608,12 @@ function saveHash(){
   const p=new URLSearchParams();
   if (state.areas.size) p.set('a',[...state.areas].join('|')); if (state.comp) p.set('c',state.comp); if (state.sit) p.set('s',state.sit);
   if (state.min) p.set('m',state.min); if (state.band!=null) p.set('b',state.band); if (state.q) p.set('q',state.q);
-  history.replaceState(null,'',p.toString()?'#'+p:location.pathname+location.search);
+  /* Em iframes com sandbox (pré-visualizações) o navegador bloqueia o history; ignorar em silêncio. */
+  try { history.replaceState(null,'',p.toString()?'#'+p:location.pathname+location.search); } catch(e){}
 }
 function loadHash(){
-  const p=new URLSearchParams(location.hash.slice(1));
+  let raw=''; try { raw=location.hash.slice(1); } catch(e){}
+  const p=new URLSearchParams(raw);
   state.areas=new Set((p.get('a')||'').split('|').filter(a=>AREAS.includes(a)));
   state.comp=COMPS.includes(p.get('c'))?p.get('c'):''; state.sit=['Pendente','Zerada','Excedente'].includes(p.get('s'))?p.get('s'):'';
   state.min=Math.max(0,Math.min(150,Number(p.get('m'))||0)); const b=p.get('b'); state.band=(b!=null&&BANDS[Number(b)])?Number(b):null; state.q=(p.get('q')||'').toLowerCase();
