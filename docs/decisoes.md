@@ -15,3 +15,14 @@
 - O Zapier, o n8n e o Make não mudam. O link do dashboard escrito na aba `resumo` e no e-mail é o endereço do GitHub Pages.
 
 **Verificação:** os números da página (149 ordens com pendência, soma 7.981, maior pendência 174 em OP-0075, top 10 de componentes e totais por área) foram conferidos contra o cálculo de referência em Python.
+
+## Gatilho manual no n8n e no Make (18/11/2026)
+
+**Decisão:** o cálculo é disparado manualmente (n8n: "Execute workflow"; Make: "Run once"). Não há agendamento ativo.
+
+**Motivo:** o projeto é uma demonstração. Um agendamento diário aumentaria o consumo de créditos do Make e de tarefas do Zapier sem agregar valor, e faria o Zapier enviar e-mails fora da demonstração.
+
+**Consequências:**
+- Em produção, o gatilho natural seria um agendamento diário (por exemplo, 07:00 em America/Sao_Paulo). Basta trocar o gatilho manual por um Schedule Trigger no n8n ou um agendamento no Make (mínimo de 15 minutos no plano gratuito).
+- Apenas uma das duas ferramentas (n8n ou Make) deve estar ativa por vez, porque o Zapier notifica toda linha nova em `resumo`.
+- O Zap do Zapier continua ligado e envia um e-mail por linha nova.
