@@ -16,17 +16,26 @@ Fluxo ponta a ponta para detectar pendências de consumo em ordens de produção
 
 O assunto de cada e-mail leva o prefixo da ferramenta que escreveu a linha: `[N8N]`, `[MAKE]` ou `[ZAPIER]`.
 
+## Dashboard (HTML)
+
+Página única, sem servidor e sem instalação: [`docs/index.html`](docs/index.html). Ela traz indicadores (ordens com pendência, soma pendente, maior pendência, consumo vs. necessário), Top 10 de componentes, pendência por área, faixas de severidade, mapa de calor área × componente e a tabela de ordens, com filtros por área, componente, situação, pendência mínima e busca por ordem. Clicar num gráfico filtra todos os outros; o recorte fica na URL e pode ser baixado em CSV. Tema claro e escuro, e cada gráfico tem uma visão em tabela.
+
+- Demo pública (GitHub Pages): https://prodigyb0y.github.io/alerta-desvio-consumo/
+- Os dados vão embutidos como snapshot. Para ler ao vivo da aba `ordens`, publique a aba como CSV no Google Sheets (Arquivo > Compartilhar > Publicar na web) e cole a URL em `SHEET_CSV_URL` no HTML.
+- Para regenerar a página depois de mudar o CSV: `python3 scripts/build_dashboard.py` (usa `dashboard/template.html`).
+
 ## Estrutura do repositório
 
 | Pasta | Conteúdo |
 |---|---|
 | `dados/` | CSV gerado |
+| `dashboard/` | Template do dashboard HTML |
 | `scripts/` | `gerar_dados.py`, `gerar_dashboard.py` e cálculo de referência em Python |
 | `dashboard/` | `template.html` e o `index.html` gerado (dashboard) |
 | `n8n/` | `workflow.json` exportado |
 | `make/` | Blueprint exportado |
 | `zapier/` | Descrição do Zap |
-| `docs/` | Evidências, limitações e decisões |
+| `docs/` | Dashboard publicado (`index.html`), evidências, limitações e decisões |
 
 ## Limitações dos planos gratuitos
 

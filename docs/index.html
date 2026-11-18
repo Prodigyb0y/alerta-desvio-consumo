@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alerta de desvio de consumo · Gutenberg Systems</title>
+<style>
+:root{
+  color-scheme: light;
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,.10);
+  --s1:#2a78d6; --s1-hover:#1c5cab; --track:#cde2fb; --deemph:#c3c2b7; --empty:#efeeea;
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
+  --ord1:#86b6ef; --ord2:#5598e7; --ord3:#2a78d6; --ord4:#184f95;
+  --shadow:0 4px 16px rgba(11,11,11,.16);
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme: dark;
+    --page:#0d0d0d; --surface:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+    --s1:#3987e5; --s1-hover:#6da7ec; --track:#0d366b; --deemph:#4a4945; --empty:#242422;
+    --shadow:0 4px 16px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --page:#0d0d0d; --surface:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+  --s1:#3987e5; --s1-hover:#6da7ec; --track:#0d366b; --deemph:#4a4945; --empty:#242422;
+  --shadow:0 4px 16px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--page);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1280px;margin:0 auto;padding:20px 20px 56px}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+
+/* header */
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+h1{font-size:20px;font-weight:600;margin:0}
+.sub{color:var(--ink2);font-size:13px;margin-top:2px}
+.btn{height:32px;padding:0 12px;border:1px solid var(--axis);border-radius:6px;background:var(--surface);color:var(--ink)}
+.btn:hover{background:var(--empty)}
+.btn.primary{background:var(--s1);border-color:var(--s1);color:#fff}
+.btn.primary:hover{background:var(--s1-hover);border-color:var(--s1-hover)}
+
+/* filters: one row above everything it scopes */
+.filters{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end;margin:16px 0 8px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:12px}
+.f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.f > .lab{font-size:12px;color:var(--ink2)}
+select,input[type=search]{height:32px;border:1px solid var(--axis);border-radius:6px;background:var(--surface);padding:0 8px}
+input[type=search]{width:150px}
+select{min-width:150px}
+.seg{display:flex;gap:6px}
+.chip{height:32px;padding:0 12px;border-radius:16px;border:1px solid var(--axis);background:transparent;color:var(--ink2)}
+.chip[aria-pressed="true"]{background:var(--s1);border-color:var(--s1);color:#fff}
+input[type=range]{width:150px;accent-color:var(--s1);margin:0;height:32px}
+.active{display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-height:28px;margin:0 0 12px;font-size:13px;color:var(--ink2)}
+.tag{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 6px 0 10px;border-radius:13px;background:var(--empty);border:1px solid var(--border);color:var(--ink)}
+.tag button{border:0;background:transparent;width:18px;height:18px;line-height:16px;border-radius:9px;padding:0;color:var(--ink2)}
+.tag button:hover{background:var(--axis)}
+
+/* cards & grid */
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;min-width:0;transition:opacity .2s}
+.loading .card{opacity:.6}
+.c7{grid-column:span 7}.c5{grid-column:span 5}.c12{grid-column:span 12}
+.stack{grid-column:span 5;display:grid;gap:12px;align-content:start}
+.chead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.chead h2{font-size:14px;font-weight:600;margin:0}
+.insight{font-size:13px;color:var(--ink2);margin:2px 0 0}
+.tvbtn{height:26px;padding:0 10px;border:1px solid var(--axis);border-radius:6px;background:transparent;font-size:12px;color:var(--ink2);white-space:nowrap}
+.tvbtn[aria-pressed="true"]{background:var(--empty);color:var(--ink)}
+.empty{padding:28px 0;text-align:center;color:var(--ink2)}
+
+/* KPIs */
+.kpis{display:grid;grid-template-columns:1.5fr repeat(4,1fr);gap:12px;margin-bottom:12px}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;min-width:0}
+.tile .l{font-size:12px;color:var(--ink2)}
+.tile .v{font-size:28px;font-weight:600;line-height:1.15;margin-top:4px}
+.tile.hero .v{font-size:56px;line-height:1.05}
+.tile .d{font-size:12px;color:var(--ink2);margin-top:4px}
+.meter{height:6px;border-radius:3px;background:var(--track);margin-top:8px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--s1);border-radius:3px}
+
+/* horizontal ranked bars */
+.hrow{display:grid;grid-template-columns:minmax(96px,170px) 1fr;align-items:center;gap:10px;padding:2px 6px;border-radius:6px;cursor:pointer}
+.hrow:hover{background:rgba(127,127,127,.09)}
+.hname{font-size:13px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.htrack{position:relative;height:24px;border-left:1px solid var(--axis)}
+.hbar{position:absolute;left:0;top:4px;height:16px;border-radius:0 4px 4px 0;background:var(--s1);transition:width .25s,background .15s}
+.hrow:hover .hbar{background:var(--s1-hover)}
+.hval{position:absolute;top:0;line-height:24px;font-size:12px;font-weight:600}
+.hrow.dim .hbar{background:var(--deemph)}
+.hrow.sel .hname{color:var(--ink);font-weight:600}
+
+#card-top{display:flex;flex-direction:column}
+#card-top .cbody{flex:1;display:flex;flex-direction:column}
+#card-top .hbars{flex:1;display:flex;flex-direction:column;justify-content:space-evenly}
+
+/* band columns */
+.cols{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;height:196px}
+.col{display:flex;flex-direction:column;cursor:pointer;border-radius:6px;padding:0 4px}
+.col:hover{background:rgba(127,127,127,.09)}
+.plot{position:relative;flex:1;border-bottom:1px solid var(--axis)}
+.cbar{position:absolute;bottom:0;left:50%;width:24px;margin-left:-12px;border-radius:4px 4px 0 0;transition:height .25s,opacity .15s}
+.ccap{position:absolute;left:0;right:0;text-align:center;font-size:12px;font-weight:600}
+.xl{font-size:12px;color:var(--ink2);text-align:center;padding-top:6px;height:28px}
+.col.dim .cbar{opacity:.35}
+.col.sel .xl{color:var(--ink);font-weight:600}
+
+/* heatmap */
+.heatwrap{overflow-x:auto}
+.heat{display:grid;gap:2px;min-width:860px}
+.hh{font-size:11px;color:var(--ink2);text-align:center;display:flex;align-items:flex-end;justify-content:center;padding:0 2px 4px;line-height:1.2}
+.hr{font-size:13px;color:var(--ink2);display:flex;align-items:center}
+.cell{height:44px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;cursor:pointer;border:0;padding:0}
+.cell:hover{outline:2px solid var(--ink2);outline-offset:-2px}
+.cell.sel{outline:2px solid var(--ink);outline-offset:-2px}
+.tot{font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.scale{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--ink2)}
+.scale i{display:block;width:160px;height:8px;border-radius:4px}
+
+/* table */
+.tools{display:flex;gap:8px;align-items:center}
+.tscroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--grid);white-space:nowrap}
+th{font-weight:600;color:var(--ink2);font-size:12px;position:sticky;top:0;background:var(--surface)}
+th button{border:0;background:transparent;font:inherit;font-weight:600;color:inherit;padding:0}
+th button:hover{color:var(--ink)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tbody tr:hover{background:rgba(127,127,127,.07)}
+.badge{display:inline-flex;align-items:center;gap:6px}
+.badge svg{width:14px;height:14px;flex:none}
+.pager{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:13px;color:var(--ink2)}
+.pager .btn{height:28px}
+.pager .btn[disabled]{opacity:.4;cursor:default}
+table.tv{font-size:12px}
+
+/* tooltip */
+.tip{position:fixed;z-index:50;left:0;top:0;pointer-events:none;background:var(--surface);border:1px solid var(--axis);border-radius:8px;padding:8px 10px;box-shadow:var(--shadow);font-size:12px;max-width:260px;opacity:0;transition:opacity .1s}
+.t-title{color:var(--ink2);margin-bottom:4px}
+.t-row{display:flex;align-items:center;gap:8px}
+.t-row .key{width:12px;height:3px;border-radius:2px;flex:none}
+.t-row .t-k{color:var(--ink2);flex:1}
+.t-row strong{color:var(--ink);font-weight:600}
+
+footer{margin-top:20px;font-size:12px;color:var(--ink2);display:flex;flex-wrap:wrap;gap:4px 16px}
+
+@media (max-width: 1000px){
+  .kpis{grid-template-columns:1fr 1fr}
+  .tile.hero{grid-column:span 2}
+  .c7,.c5,.stack{grid-column:span 12}
+}
+@media (max-width: 560px){
+  .kpis{grid-template-columns:1fr}.tile.hero{grid-column:auto}
+  .tile.hero .v{font-size:48px}
+  .hrow{grid-template-columns:96px 1fr}
+}
+@media print{ .filters,.tvbtn,.tools,.pager,#themeBtn{display:none} body{background:#fff} }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="top">
+    <div>
+      <h1>Alerta de desvio de consumo</h1>
+      <div class="sub">Gutenberg Systems · pendências de consumo por ordem · dados fictícios</div>
+    </div>
+    <div class="tools">
+      <button class="btn" id="refreshBtn" hidden>Atualizar dados</button>
+      <button class="btn" id="themeBtn" aria-label="Alternar tema claro e escuro">Tema</button>
+    </div>
+  </div>
+
+  <section class="filters" aria-label="Filtros do dashboard">
+    <div class="f"><span class="lab">Área</span><div class="seg" id="fArea"></div></div>
+    <div class="f"><label class="lab" for="fComp">Componente</label><select id="fComp"></select></div>
+    <div class="f"><label class="lab" for="fSit">Situação</label>
+      <select id="fSit">
+        <option value="">Todas</option>
+        <option value="Pendente">Pendente (falta consumir)</option>
+        <option value="Zerada">Zerada</option>
+        <option value="Excedente">Excedente (consumo a mais)</option>
+      </select></div>
+    <div class="f"><label class="lab" for="fMin">Pendência mínima: <b id="fMinV">0</b> un</label><input type="range" id="fMin" min="0" max="150" step="5" value="0"></div>
+    <div class="f"><label class="lab" for="fQ">Buscar ordem</label><input type="search" id="fQ" placeholder="ex.: OP-0075"></div>
+    <button class="btn" id="clearBtn">Limpar filtros</button>
+  </section>
+  <div class="active" id="active" aria-live="polite"></div>
+
+  <section class="kpis" id="kpis" aria-label="Indicadores"></section>
+
+  <section class="grid">
+    <article class="card c7" id="card-top">
+      <div class="chead"><div><h2>Top 10 componentes por pendência</h2><p class="insight"></p></div><button class="tvbtn" aria-pressed="false">Ver tabela</button></div>
+      <div class="cbody"></div>
+    </article>
+    <div class="stack">
+      <article class="card" id="card-area">
+        <div class="chead"><div><h2>Pendência por área</h2><p class="insight"></p></div><button class="tvbtn" aria-pressed="false">Ver tabela</button></div>
+        <div class="cbody"></div>
+      </article>
+      <article class="card" id="card-band">
+        <div class="chead"><div><h2>Ordens por faixa de pendência</h2><p class="insight"></p></div><button class="tvbtn" aria-pressed="false">Ver tabela</button></div>
+        <div class="cbody"></div>
+      </article>
+    </div>
+    <article class="card c12" id="card-heat">
+      <div class="chead"><div><h2>Onde a pendência se concentra: área × componente</h2><p class="insight"></p></div><button class="tvbtn" aria-pressed="false">Ver tabela</button></div>
+      <div class="cbody"></div>
+    </article>
+    <article class="card c12" id="card-table">
+      <div class="chead"><div><h2>Ordens no recorte</h2><p class="insight"></p></div>
+        <div class="tools"><button class="btn" id="csvBtn">Baixar CSV do recorte</button></div></div>
+      <div class="cbody"></div>
+    </article>
+  </section>
+
+  <footer>
+    <span id="source"></span>
+    <span>Pendente = qtd_necessaria − qtd_consumida, quando maior que zero.</span>
+    <span>Dados fictícios gerados por scripts/gerar_dados.py (seed 42).</span>
+  </footer>
+</div>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+/* ===== Configuração =====
+   SHEET_CSV_URL vazio  -> usa o snapshot embutido abaixo (funciona offline).
+   SHEET_CSV_URL com URL -> carrega ao vivo da aba "ordens" publicada na web
+   (Google Sheets > Arquivo > Compartilhar > Publicar na web > aba ordens > CSV). */
+const SHEET_CSV_URL = "";
+const EMBEDDED_CSV = `ordem,area,componente,qtd_necessaria,qtd_consumida,qtd_pendente,email_responsavel
+OP-0001,Área C,Parafuso M8,337,223,114,gutenberg.demo.operacoes@gmail.com
+OP-0002,Área C,Correia dentada,135,98,37,gutenberg.demo.operacoes@gmail.com
+OP-0003,Área C,Correia dentada,356,359,-3,gutenberg.demo.operacoes@gmail.com
+OP-0004,Área A,Correia dentada,312,260,52,gutenberg.demo.operacoes@gmail.com
+OP-0005,Área C,Rolamento 6204,121,88,33,gutenberg.demo.operacoes@gmail.com
+OP-0006,Área C,Mancal de apoio,297,211,86,gutenberg.demo.operacoes@gmail.com
+OP-0007,Área B,Cabo de sinal,289,240,49,gutenberg.demo.operacoes@gmail.com
+OP-0008,Área A,Sensor de pressão,152,159,-7,gutenberg.demo.operacoes@gmail.com
+OP-0009,Área B,Sensor de pressão,367,306,61,gutenberg.demo.operacoes@gmail.com
+OP-0010,Área B,Correia dentada,120,135,-15,gutenberg.demo.operacoes@gmail.com
+OP-0011,Área B,Filtro de ar,57,46,11,gutenberg.demo.operacoes@gmail.com
+OP-0012,Área A,Mancal de apoio,319,238,81,gutenberg.demo.operacoes@gmail.com
+OP-0013,Área B,Correia dentada,245,219,26,gutenberg.demo.operacoes@gmail.com
+OP-0014,Área C,Cabo de sinal,292,222,70,gutenberg.demo.operacoes@gmail.com
+OP-0015,Área C,Válvula solenoide,463,497,-34,gutenberg.demo.operacoes@gmail.com
+OP-0016,Área C,Válvula solenoide,370,236,134,gutenberg.demo.operacoes@gmail.com
+OP-0017,Área A,Válvula solenoide,405,307,98,gutenberg.demo.operacoes@gmail.com
+OP-0018,Área B,Placa de controle,453,297,156,gutenberg.demo.operacoes@gmail.com
+OP-0019,Área A,Filtro de ar,335,355,-20,gutenberg.demo.operacoes@gmail.com
+OP-0020,Área B,Mancal de apoio,191,137,54,gutenberg.demo.operacoes@gmail.com
+OP-0021,Área A,Cabo de sinal,489,477,12,gutenberg.demo.operacoes@gmail.com
+OP-0022,Área C,Válvula solenoide,335,233,102,gutenberg.demo.operacoes@gmail.com
+OP-0023,Área B,Engrenagem helicoidal,93,79,14,gutenberg.demo.operacoes@gmail.com
+OP-0024,Área C,Filtro de ar,362,328,34,gutenberg.demo.operacoes@gmail.com
+OP-0025,Área A,Válvula solenoide,441,451,-10,gutenberg.demo.operacoes@gmail.com
+OP-0026,Área B,Motor 1/2 cv,430,266,164,gutenberg.demo.operacoes@gmail.com
+OP-0027,Área C,Mancal de apoio,147,94,53,gutenberg.demo.operacoes@gmail.com
+OP-0028,Área B,Motor 1/2 cv,171,123,48,gutenberg.demo.operacoes@gmail.com
+OP-0029,Área B,Sensor de pressão,462,510,-48,gutenberg.demo.operacoes@gmail.com
+OP-0030,Área C,Vedação de borracha,145,98,47,gutenberg.demo.operacoes@gmail.com
+OP-0031,Área C,Motor 1/2 cv,285,212,73,gutenberg.demo.operacoes@gmail.com
+OP-0032,Área B,Válvula solenoide,469,432,37,gutenberg.demo.operacoes@gmail.com
+OP-0033,Área A,Rolamento 6204,80,70,10,gutenberg.demo.operacoes@gmail.com
+OP-0034,Área C,Sensor de pressão,450,297,153,gutenberg.demo.operacoes@gmail.com
+OP-0035,Área C,Correia dentada,415,404,11,gutenberg.demo.operacoes@gmail.com
+OP-0036,Área B,Vedação de borracha,207,168,39,gutenberg.demo.operacoes@gmail.com
+OP-0037,Área A,Engrenagem helicoidal,138,157,-19,gutenberg.demo.operacoes@gmail.com
+OP-0038,Área C,Parafuso M8,379,251,128,gutenberg.demo.operacoes@gmail.com
+OP-0039,Área A,Parafuso M8,403,384,19,gutenberg.demo.operacoes@gmail.com
+OP-0040,Área A,Mancal de apoio,232,159,73,gutenberg.demo.operacoes@gmail.com
+OP-0041,Área C,Sensor de pressão,458,456,2,gutenberg.demo.operacoes@gmail.com
+OP-0042,Área C,Parafuso M8,269,296,-27,gutenberg.demo.operacoes@gmail.com
+OP-0043,Área C,Válvula solenoide,440,419,21,gutenberg.demo.operacoes@gmail.com
+OP-0044,Área A,Vedação de borracha,88,71,17,gutenberg.demo.operacoes@gmail.com
+OP-0045,Área C,Rolamento 6204,498,512,-14,gutenberg.demo.operacoes@gmail.com
+OP-0046,Área A,Correia dentada,316,246,70,gutenberg.demo.operacoes@gmail.com
+OP-0047,Área B,Válvula solenoide,485,388,97,gutenberg.demo.operacoes@gmail.com
+OP-0048,Área C,Correia dentada,39,29,10,gutenberg.demo.operacoes@gmail.com
+OP-0049,Área A,Vedação de borracha,53,53,0,gutenberg.demo.operacoes@gmail.com
+OP-0050,Área C,Placa de controle,402,269,133,gutenberg.demo.operacoes@gmail.com
+OP-0051,Área B,Vedação de borracha,494,446,48,gutenberg.demo.operacoes@gmail.com
+OP-0052,Área A,Vedação de borracha,456,426,30,gutenberg.demo.operacoes@gmail.com
+OP-0053,Área A,Mancal de apoio,396,397,-1,gutenberg.demo.operacoes@gmail.com
+OP-0054,Área C,Engrenagem helicoidal,169,138,31,gutenberg.demo.operacoes@gmail.com
+OP-0055,Área C,Placa de controle,201,169,32,gutenberg.demo.operacoes@gmail.com
+OP-0056,Área A,Filtro de ar,71,52,19,gutenberg.demo.operacoes@gmail.com
+OP-0057,Área A,Cabo de sinal,20,18,2,gutenberg.demo.operacoes@gmail.com
+OP-0058,Área C,Engrenagem helicoidal,122,74,48,gutenberg.demo.operacoes@gmail.com
+OP-0059,Área A,Filtro de ar,40,29,11,gutenberg.demo.operacoes@gmail.com
+OP-0060,Área B,Engrenagem helicoidal,46,41,5,gutenberg.demo.operacoes@gmail.com
+OP-0061,Área A,Mancal de apoio,258,185,73,gutenberg.demo.operacoes@gmail.com
+OP-0062,Área C,Placa de controle,488,530,-42,gutenberg.demo.operacoes@gmail.com
+OP-0063,Área B,Válvula solenoide,134,138,-4,gutenberg.demo.operacoes@gmail.com
+OP-0064,Área B,Filtro de ar,58,38,20,gutenberg.demo.operacoes@gmail.com
+OP-0065,Área C,Rolamento 6204,226,187,39,gutenberg.demo.operacoes@gmail.com
+OP-0066,Área C,Correia dentada,354,340,14,gutenberg.demo.operacoes@gmail.com
+OP-0067,Área B,Correia dentada,41,34,7,gutenberg.demo.operacoes@gmail.com
+OP-0068,Área C,Placa de controle,137,97,40,gutenberg.demo.operacoes@gmail.com
+OP-0069,Área B,Placa de controle,81,67,14,gutenberg.demo.operacoes@gmail.com
+OP-0070,Área A,Placa de controle,137,148,-11,gutenberg.demo.operacoes@gmail.com
+OP-0071,Área C,Correia dentada,423,454,-31,gutenberg.demo.operacoes@gmail.com
+OP-0072,Área C,Rolamento 6204,35,34,1,gutenberg.demo.operacoes@gmail.com
+OP-0073,Área A,Sensor de pressão,57,63,-6,gutenberg.demo.operacoes@gmail.com
+OP-0074,Área A,Motor 1/2 cv,218,189,29,gutenberg.demo.operacoes@gmail.com
+OP-0075,Área B,Rolamento 6204,472,298,174,gutenberg.demo.operacoes@gmail.com
+OP-0076,Área B,Parafuso M8,209,156,53,gutenberg.demo.operacoes@gmail.com
+OP-0077,Área C,Vedação de borracha,226,222,4,gutenberg.demo.operacoes@gmail.com
+OP-0078,Área A,Válvula solenoide,348,346,2,gutenberg.demo.operacoes@gmail.com
+OP-0079,Área A,Cabo de sinal,161,116,45,gutenberg.demo.operacoes@gmail.com
+OP-0080,Área C,Filtro de ar,386,347,39,gutenberg.demo.operacoes@gmail.com
+OP-0081,Área B,Vedação de borracha,39,24,15,gutenberg.demo.operacoes@gmail.com
+OP-0082,Área A,Rolamento 6204,480,513,-33,gutenberg.demo.operacoes@gmail.com
+OP-0083,Área A,Correia dentada,270,174,96,gutenberg.demo.operacoes@gmail.com
+OP-0084,Área A,Motor 1/2 cv,314,200,114,gutenberg.demo.operacoes@gmail.com
+OP-0085,Área C,Válvula solenoide,71,79,-8,gutenberg.demo.operacoes@gmail.com
+OP-0086,Área C,Correia dentada,306,284,22,gutenberg.demo.operacoes@gmail.com
+OP-0087,Área C,Vedação de borracha,224,215,9,gutenberg.demo.operacoes@gmail.com
+OP-0088,Área A,Engrenagem helicoidal,171,191,-20,gutenberg.demo.operacoes@gmail.com
+OP-0089,Área B,Motor 1/2 cv,376,291,85,gutenberg.demo.operacoes@gmail.com
+OP-0090,Área B,Placa de controle,77,75,2,gutenberg.demo.operacoes@gmail.com
+OP-0091,Área A,Rolamento 6204,171,190,-19,gutenberg.demo.operacoes@gmail.com
+OP-0092,Área C,Correia dentada,244,230,14,gutenberg.demo.operacoes@gmail.com
+OP-0093,Área C,Parafuso M8,47,42,5,gutenberg.demo.operacoes@gmail.com
+OP-0094,Área A,Válvula solenoide,77,86,-9,gutenberg.demo.operacoes@gmail.com
+OP-0095,Área B,Vedação de borracha,199,151,48,gutenberg.demo.operacoes@gmail.com
+OP-0096,Área C,Vedação de borracha,370,284,86,gutenberg.demo.operacoes@gmail.com
+OP-0097,Área C,Parafuso M8,14,14,0,gutenberg.demo.operacoes@gmail.com
+OP-0098,Área A,Parafuso M8,487,470,17,gutenberg.demo.operacoes@gmail.com
+OP-0099,Área C,Vedação de borracha,69,75,-6,gutenberg.demo.operacoes@gmail.com
+OP-0100,Área C,Válvula solenoide,89,67,22,gutenberg.demo.operacoes@gmail.com
+OP-0101,Área C,Engrenagem helicoidal,377,297,80,gutenberg.demo.operacoes@gmail.com
+OP-0102,Área B,Parafuso M8,446,332,114,gutenberg.demo.operacoes@gmail.com
+OP-0103,Área A,Correia dentada,473,520,-47,gutenberg.demo.operacoes@gmail.com
+OP-0104,Área B,Rolamento 6204,334,278,56,gutenberg.demo.operacoes@gmail.com
+OP-0105,Área A,Engrenagem helicoidal,11,9,2,gutenberg.demo.operacoes@gmail.com
+OP-0106,Área B,Vedação de borracha,144,99,45,gutenberg.demo.operacoes@gmail.com
+OP-0107,Área A,Correia dentada,371,310,61,gutenberg.demo.operacoes@gmail.com
+OP-0108,Área C,Sensor de pressão,48,54,-6,gutenberg.demo.operacoes@gmail.com
+OP-0109,Área B,Cabo de sinal,289,179,110,gutenberg.demo.operacoes@gmail.com
+OP-0110,Área A,Rolamento 6204,292,199,93,gutenberg.demo.operacoes@gmail.com
+OP-0111,Área A,Filtro de ar,167,134,33,gutenberg.demo.operacoes@gmail.com
+OP-0112,Área C,Correia dentada,117,114,3,gutenberg.demo.operacoes@gmail.com
+OP-0113,Área B,Cabo de sinal,191,197,-6,gutenberg.demo.operacoes@gmail.com
+OP-0114,Área A,Sensor de pressão,393,269,124,gutenberg.demo.operacoes@gmail.com
+OP-0115,Área B,Rolamento 6204,419,438,-19,gutenberg.demo.operacoes@gmail.com
+OP-0116,Área B,Motor 1/2 cv,101,102,-1,gutenberg.demo.operacoes@gmail.com
+OP-0117,Área C,Válvula solenoide,420,407,13,gutenberg.demo.operacoes@gmail.com
+OP-0118,Área C,Correia dentada,146,100,46,gutenberg.demo.operacoes@gmail.com
+OP-0119,Área B,Válvula solenoide,205,221,-16,gutenberg.demo.operacoes@gmail.com
+OP-0120,Área B,Filtro de ar,112,118,-6,gutenberg.demo.operacoes@gmail.com
+OP-0121,Área A,Válvula solenoide,166,175,-9,gutenberg.demo.operacoes@gmail.com
+OP-0122,Área B,Filtro de ar,22,21,1,gutenberg.demo.operacoes@gmail.com
+OP-0123,Área B,Filtro de ar,152,163,-11,gutenberg.demo.operacoes@gmail.com
+OP-0124,Área C,Vedação de borracha,338,297,41,gutenberg.demo.operacoes@gmail.com
+OP-0125,Área A,Parafuso M8,179,200,-21,gutenberg.demo.operacoes@gmail.com
+OP-0126,Área B,Rolamento 6204,101,93,8,gutenberg.demo.operacoes@gmail.com
+OP-0127,Área B,Mancal de apoio,65,60,5,gutenberg.demo.operacoes@gmail.com
+OP-0128,Área C,Vedação de borracha,412,318,94,gutenberg.demo.operacoes@gmail.com
+OP-0129,Área C,Válvula solenoide,69,56,13,gutenberg.demo.operacoes@gmail.com
+OP-0130,Área B,Rolamento 6204,140,87,53,gutenberg.demo.operacoes@gmail.com
+OP-0131,Área C,Engrenagem helicoidal,276,306,-30,gutenberg.demo.operacoes@gmail.com
+OP-0132,Área C,Engrenagem helicoidal,378,422,-44,gutenberg.demo.operacoes@gmail.com
+OP-0133,Área A,Engrenagem helicoidal,110,88,22,gutenberg.demo.operacoes@gmail.com
+OP-0134,Área B,Engrenagem helicoidal,481,376,105,gutenberg.demo.operacoes@gmail.com
+OP-0135,Área B,Vedação de borracha,444,297,147,gutenberg.demo.operacoes@gmail.com
+OP-0136,Área B,Motor 1/2 cv,168,162,6,gutenberg.demo.operacoes@gmail.com
+OP-0137,Área A,Válvula solenoide,366,279,87,gutenberg.demo.operacoes@gmail.com
+OP-0138,Área B,Engrenagem helicoidal,225,217,8,gutenberg.demo.operacoes@gmail.com
+OP-0139,Área C,Cabo de sinal,393,431,-38,gutenberg.demo.operacoes@gmail.com
+OP-0140,Área A,Parafuso M8,164,135,29,gutenberg.demo.operacoes@gmail.com
+OP-0141,Área C,Cabo de sinal,156,112,44,gutenberg.demo.operacoes@gmail.com
+OP-0142,Área B,Placa de controle,345,268,77,gutenberg.demo.operacoes@gmail.com
+OP-0143,Área B,Mancal de apoio,355,255,100,gutenberg.demo.operacoes@gmail.com
+OP-0144,Área B,Vedação de borracha,96,92,4,gutenberg.demo.operacoes@gmail.com
+OP-0145,Área B,Correia dentada,349,331,18,gutenberg.demo.operacoes@gmail.com
+OP-0146,Área A,Engrenagem helicoidal,429,482,-53,gutenberg.demo.operacoes@gmail.com
+OP-0147,Área A,Sensor de pressão,168,122,46,gutenberg.demo.operacoes@gmail.com
+OP-0148,Área B,Cabo de sinal,22,14,8,gutenberg.demo.operacoes@gmail.com
+OP-0149,Área B,Motor 1/2 cv,445,455,-10,gutenberg.demo.operacoes@gmail.com
+OP-0150,Área A,Mancal de apoio,463,438,25,gutenberg.demo.operacoes@gmail.com
+OP-0151,Área B,Válvula solenoide,366,297,69,gutenberg.demo.operacoes@gmail.com
+OP-0152,Área A,Correia dentada,85,82,3,gutenberg.demo.operacoes@gmail.com
+OP-0153,Área A,Mancal de apoio,408,340,68,gutenberg.demo.operacoes@gmail.com
+OP-0154,Área C,Válvula solenoide,275,235,40,gutenberg.demo.operacoes@gmail.com
+OP-0155,Área B,Sensor de pressão,479,511,-32,gutenberg.demo.operacoes@gmail.com
+OP-0156,Área C,Vedação de borracha,420,359,61,gutenberg.demo.operacoes@gmail.com
+OP-0157,Área B,Cabo de sinal,314,243,71,gutenberg.demo.operacoes@gmail.com
+OP-0158,Área C,Motor 1/2 cv,427,425,2,gutenberg.demo.operacoes@gmail.com
+OP-0159,Área B,Sensor de pressão,435,478,-43,gutenberg.demo.operacoes@gmail.com
+OP-0160,Área B,Parafuso M8,390,419,-29,gutenberg.demo.operacoes@gmail.com
+OP-0161,Área C,Parafuso M8,394,290,104,gutenberg.demo.operacoes@gmail.com
+OP-0162,Área B,Engrenagem helicoidal,402,413,-11,gutenberg.demo.operacoes@gmail.com
+OP-0163,Área A,Mancal de apoio,132,99,33,gutenberg.demo.operacoes@gmail.com
+OP-0164,Área B,Filtro de ar,156,114,42,gutenberg.demo.operacoes@gmail.com
+OP-0165,Área A,Sensor de pressão,467,419,48,gutenberg.demo.operacoes@gmail.com
+OP-0166,Área A,Mancal de apoio,128,104,24,gutenberg.demo.operacoes@gmail.com
+OP-0167,Área B,Filtro de ar,119,76,43,gutenberg.demo.operacoes@gmail.com
+OP-0168,Área A,Válvula solenoide,287,246,41,gutenberg.demo.operacoes@gmail.com
+OP-0169,Área C,Mancal de apoio,436,362,74,gutenberg.demo.operacoes@gmail.com
+OP-0170,Área C,Motor 1/2 cv,20,21,-1,gutenberg.demo.operacoes@gmail.com
+OP-0171,Área B,Parafuso M8,254,153,101,gutenberg.demo.operacoes@gmail.com
+OP-0172,Área B,Vedação de borracha,395,322,73,gutenberg.demo.operacoes@gmail.com
+OP-0173,Área C,Válvula solenoide,392,394,-2,gutenberg.demo.operacoes@gmail.com
+OP-0174,Área B,Placa de controle,259,187,72,gutenberg.demo.operacoes@gmail.com
+OP-0175,Área C,Engrenagem helicoidal,24,20,4,gutenberg.demo.operacoes@gmail.com
+OP-0176,Área A,Placa de controle,418,344,74,gutenberg.demo.operacoes@gmail.com
+OP-0177,Área C,Vedação de borracha,480,322,158,gutenberg.demo.operacoes@gmail.com
+OP-0178,Área C,Cabo de sinal,23,25,-2,gutenberg.demo.operacoes@gmail.com
+OP-0179,Área C,Motor 1/2 cv,349,215,134,gutenberg.demo.operacoes@gmail.com
+OP-0180,Área A,Rolamento 6204,79,85,-6,gutenberg.demo.operacoes@gmail.com
+OP-0181,Área A,Placa de controle,143,116,27,gutenberg.demo.operacoes@gmail.com
+OP-0182,Área B,Parafuso M8,177,139,38,gutenberg.demo.operacoes@gmail.com
+OP-0183,Área B,Parafuso M8,395,444,-49,gutenberg.demo.operacoes@gmail.com
+OP-0184,Área A,Mancal de apoio,437,282,155,gutenberg.demo.operacoes@gmail.com
+OP-0185,Área B,Válvula solenoide,286,180,106,gutenberg.demo.operacoes@gmail.com
+OP-0186,Área C,Rolamento 6204,342,218,124,gutenberg.demo.operacoes@gmail.com
+OP-0187,Área A,Válvula solenoide,396,244,152,gutenberg.demo.operacoes@gmail.com
+OP-0188,Área A,Válvula solenoide,439,268,171,gutenberg.demo.operacoes@gmail.com
+OP-0189,Área A,Cabo de sinal,74,64,10,gutenberg.demo.operacoes@gmail.com
+OP-0190,Área C,Parafuso M8,495,356,139,gutenberg.demo.operacoes@gmail.com
+OP-0191,Área C,Cabo de sinal,402,323,79,gutenberg.demo.operacoes@gmail.com
+OP-0192,Área A,Parafuso M8,392,390,2,gutenberg.demo.operacoes@gmail.com
+OP-0193,Área B,Cabo de sinal,65,60,5,gutenberg.demo.operacoes@gmail.com
+OP-0194,Área B,Motor 1/2 cv,356,391,-35,gutenberg.demo.operacoes@gmail.com
+OP-0195,Área A,Cabo de sinal,492,489,3,gutenberg.demo.operacoes@gmail.com
+OP-0196,Área A,Correia dentada,363,384,-21,gutenberg.demo.operacoes@gmail.com
+OP-0197,Área C,Cabo de sinal,366,375,-9,gutenberg.demo.operacoes@gmail.com
+OP-0198,Área C,Rolamento 6204,422,281,141,gutenberg.demo.operacoes@gmail.com
+OP-0199,Área C,Filtro de ar,187,167,20,gutenberg.demo.operacoes@gmail.com
+OP-0200,Área B,Rolamento 6204,45,40,5,gutenberg.demo.operacoes@gmail.com`;
+
+/* ===== Utilidades ===== */
+const $ = s => document.querySelector(s);
+const fmt = n => Math.round(n).toLocaleString('pt-BR');
+const pct = (a,b) => b ? ((a/b)*100).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%' : '—';
+const sit = d => d.pend>0 ? 'Pendente' : d.pend===0 ? 'Zerada' : 'Excedente';
+function h(tag, props={}, ...kids){
+  const e = document.createElement(tag);
+  for (const [k,v] of Object.entries(props)){
+    if (v==null || v===false) continue;
+    if (k==='class') e.className=v;
+    else if (k==='style') e.style.cssText=v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v===true ? '' : v);
+  }
+  for (const c of kids.flat()){ if (c==null||c===false) continue; e.append(c.nodeType ? c : document.createTextNode(String(c))); }
+  return e;
+}
+function parseCSV(text){
+  const rows=[]; let row=[], cur='', q=false;
+  for (let i=0;i<text.length;i++){
+    const c=text[i];
+    if (q){ if (c==='"'){ if (text[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+    else if (c==='"') q=true;
+    else if (c===','){ row.push(cur); cur=''; }
+    else if (c==='\n'||c==='\r'){ if (c==='\r'&&text[i+1]==='\n') i++; row.push(cur); cur=''; if (row.length>1||row[0]!=='') rows.push(row); row=[]; }
+    else cur+=c;
+  }
+  if (cur!==''||row.length){ row.push(cur); rows.push(row); }
+  return rows;
+}
+function toData(rows){
+  const hd = rows[0].map(s=>s.trim()), ix = n => hd.indexOf(n);
+  return rows.slice(1).map(r=>{
+    const nec=Number(r[ix('qtd_necessaria')]), con=Number(r[ix('qtd_consumida')]);
+    return {ordem:(r[ix('ordem')]||'').trim(), area:(r[ix('area')]||'').trim(), comp:(r[ix('componente')]||'').trim(), nec, con, pend:nec-con};
+  }).filter(d=>d.ordem && !Number.isNaN(d.pend));
+}
+
+/* ===== Estado e filtros ===== */
+const BANDS = [{lo:1,hi:25,l:'1–25'},{lo:26,hi:50,l:'26–50'},{lo:51,hi:100,l:'51–100'},{lo:101,hi:Infinity,l:'101+'}];
+const BAND_COLOR = ['var(--ord1)','var(--ord2)','var(--ord3)','var(--ord4)'];
+const state = {areas:new Set(), comp:'', sit:'', min:0, band:null, q:'', sort:{key:'pend',dir:-1}, page:0, tv:{}};
+let DATA = [], AREAS = [], COMPS = [];
+const PAGE = 12;
+
+function pass(d, excl=[]){
+  if (!excl.includes('area') && state.areas.size && !state.areas.has(d.area)) return false;
+  if (!excl.includes('comp') && state.comp && d.comp!==state.comp) return false;
+  if (!excl.includes('sit') && state.sit && sit(d)!==state.sit) return false;
+  if (!excl.includes('min') && state.min>0 && d.pend<state.min) return false;
+  if (!excl.includes('band') && state.band!=null){ const b=BANDS[state.band]; if (!(d.pend>=b.lo && d.pend<=b.hi)) return false; }
+  if (!excl.includes('q') && state.q && !d.ordem.toLowerCase().includes(state.q)) return false;
+  return true;
+}
+const rowsFor = (excl=[]) => DATA.filter(d=>pass(d,excl));
+const sumBy = (rows, key) => { const m=new Map(); for (const d of rows){ if (d.pend>0) m.set(d[key],(m.get(d[key])||0)+d.pend); } return m; };
+
+/* ===== Tema ===== */
+const isDark = () => { const t=document.documentElement.dataset.theme; return t ? t==='dark' : matchMedia('(prefers-color-scheme: dark)').matches; };
+$('#themeBtn').addEventListener('click', ()=>{
+  const next = isDark() ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem('adc-theme', next); } catch(e){}
+  render();
+});
+try { const t=localStorage.getItem('adc-theme'); if (t) document.documentElement.dataset.theme=t; } catch(e){}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>render());
+
+/* ===== Tooltip (um só, texto sempre via textContent) ===== */
+const tip = $('#tip');
+function placeTip(x,y){
+  const w=tip.offsetWidth, hh=tip.offsetHeight; let l=x+14, t=y+14;
+  if (l+w>innerWidth-8) l=x-w-14; if (t+hh>innerHeight-8) t=y-hh-14;
+  tip.style.left=Math.max(8,l)+'px'; tip.style.top=Math.max(8,t)+'px';
+}
+function showTip(x,y,data){
+  tip.replaceChildren(h('div',{class:'t-title'},data.title), ...data.rows.map(r=>h('div',{class:'t-row'},
+    h('span',{class:'key',style:`background:${r.c||'var(--s1)'}`}), h('span',{class:'t-k'},r.k), h('strong',{},r.v))));
+  tip.style.opacity=1; placeTip(x,y);
+}
+const hideTip = () => { tip.style.opacity=0; };
+function bindTip(el,data){
+  el.addEventListener('pointermove', e=>showTip(e.clientX,e.clientY,data));
+  el.addEventListener('pointerleave', hideTip);
+  el.addEventListener('focus', ()=>{ const r=el.getBoundingClientRect(); showTip(r.left+Math.min(r.width,220)/2, r.top+r.height/2, data); });
+  el.addEventListener('blur', hideTip);
+}
+const onKey = fn => e => { if (e.key==='Enter'||e.key===' '){ e.preventDefault(); fn(); } };
+
+/* ===== Cards com alternância gráfico/tabela ===== */
+function mountCard(id, insight, chartEl, tableEl){
+  const card=$('#card-'+id), body=card.querySelector('.cbody'), btn=card.querySelector('.tvbtn');
+  card.querySelector('.insight').textContent = insight;
+  const show = tv => { chartEl.hidden=tv; tableEl.hidden=!tv; btn.setAttribute('aria-pressed',String(tv)); btn.textContent = tv?'Ver gráfico':'Ver tabela'; };
+  body.replaceChildren(chartEl, tableEl);
+  btn.onclick = () => { state.tv[id]=!state.tv[id]; show(state.tv[id]); };
+  show(!!state.tv[id]);
+}
+function tableView(headers, rows){
+  return h('div',{class:'tscroll'}, h('table',{class:'tv'},
+    h('thead',{},h('tr',{},headers.map((t,i)=>h('th',{class:i?'n':''},t)))),
+    h('tbody',{},rows.map(r=>h('tr',{},r.map((c,i)=>h('td',{class:i?'n':''},c)))))));
+}
+const emptyEl = msg => h('div',{class:'empty'}, msg||'Nenhuma ordem no recorte atual.');
+
+/* ===== KPIs ===== */
+function renderKPIs(rows){
+  const pend=rows.filter(d=>d.pend>0), exc=rows.filter(d=>d.pend<0);
+  const soma=pend.reduce((a,d)=>a+d.pend,0);
+  const nec=rows.reduce((a,d)=>a+d.nec,0), con=rows.reduce((a,d)=>a+d.con,0);
+  const max=pend.reduce((m,d)=>d.pend>(m?m.pend:0)?d:m,null);
+  const tile=(cls,l,v,d,extra)=>h('div',{class:'tile '+cls},h('div',{class:'l'},l),h('div',{class:'v'},v),d?h('div',{class:'d',title:d},d):null,extra);
+  $('#kpis').replaceChildren(
+    tile('hero','Ordens com pendência',fmt(pend.length),`de ${fmt(rows.length)} ordens no recorte (${pct(pend.length,rows.length)})`),
+    tile('','Soma pendente (un)',fmt(soma),pend.length?`média de ${fmt(soma/pend.length)} un por ordem`:'sem pendência no recorte'),
+    tile('','Maior pendência (un)',max?fmt(max.pend):'—',max?`${max.ordem} · ${max.comp}`:'sem pendência no recorte'),
+    tile('','Consumo vs. necessário',nec?pct(con,nec):'—',`${fmt(con)} de ${fmt(nec)} un consumidas`,
+      h('div',{class:'meter',role:'img','aria-label':`Consumo em ${nec?pct(con,nec):'—'} do necessário`},h('i',{style:`width:${nec?Math.min(100,con/nec*100):0}%`}))),
+    tile('','Consumo acima do necessário',fmt(exc.length),`${fmt(exc.reduce((a,d)=>a-d.pend,0))} un a mais que o previsto`)
+  );
+}
+
+/* ===== Barras horizontais ranqueadas ===== */
+function hbars(items, selSet, onPick, tipOf){
+  const max=Math.max(...items.map(i=>i.v),1);
+  return h('div',{class:'hbars'}, items.map(i=>{
+    const w=i.v/max*86, isSel=selSet.has(i.key);
+    const row=h('div',{class:'hrow'+(isSel?' sel':'')+(selSet.size&&!isSel?' dim':''),role:'button',tabindex:'0','aria-pressed':String(isSel),
+      'aria-label':`${i.label}: ${fmt(i.v)} unidades pendentes. Ativar para filtrar.`, onclick:()=>onPick(i.key), onkeydown:onKey(()=>onPick(i.key))},
+      h('div',{class:'hname',title:i.label},i.label),
+      h('div',{class:'htrack'},h('div',{class:'hbar',style:`width:${w}%`}),h('div',{class:'hval',style:`left:calc(${w}% + 6px)`},fmt(i.v))));
+    bindTip(row,tipOf(i)); return row;
+  }));
+}
+
+function renderTop(){
+  const rows=rowsFor(['comp']), m=sumBy(rows,'comp'), total=[...m.values()].reduce((a,b)=>a+b,0);
+  let list=[...m.entries()].sort((a,b)=>b[1]-a[1]);
+  let top=list.slice(0,10);
+  if (state.comp && m.has(state.comp) && !top.some(t=>t[0]===state.comp)) top[9]=[state.comp,m.get(state.comp)];
+  if (!top.length){ mountCard('top','Sem pendência no recorte.',emptyEl('Sem pendência no recorte.'),emptyEl('Sem pendência no recorte.')); return; }
+  const items=top.map(([k,v])=>({key:k,label:k,v}));
+  const chart=hbars(items,new Set(state.comp?[state.comp]:[]),k=>{ state.comp = state.comp===k?'':k; state.page=0; update(); },
+    i=>({title:i.label,rows:[{k:'Pendência',v:fmt(i.v)+' un'},{k:'Parcela do total',v:pct(i.v,total)}]}));
+  const lead=items[0];
+  mountCard('top',`${lead.label} lidera com ${fmt(lead.v)} un (${pct(lead.v,total)} da pendência). Clique numa barra para filtrar.`,chart,
+    tableView(['Componente','Pendência (un)','% do total'],items.map(i=>[i.label,fmt(i.v),pct(i.v,total)])));
+}
+
+function renderArea(){
+  const rows=rowsFor(['area']), m=sumBy(rows,'area'), total=[...m.values()].reduce((a,b)=>a+b,0);
+  const list=[...m.entries()].sort((a,b)=>b[1]-a[1]);
+  if (!list.length){ mountCard('area','Sem pendência no recorte.',emptyEl('Sem pendência no recorte.'),emptyEl('Sem pendência no recorte.')); return; }
+  const cnt=new Map(); for (const d of rows) if (d.pend>0) cnt.set(d.area,(cnt.get(d.area)||0)+1);
+  const items=list.map(([k,v])=>({key:k,label:k,v}));
+  const chart=hbars(items,state.areas,k=>{ state.areas.has(k)?state.areas.delete(k):state.areas.add(k); state.page=0; update(); },
+    i=>({title:i.label,rows:[{k:'Pendência',v:fmt(i.v)+' un'},{k:'Ordens pendentes',v:fmt(cnt.get(i.key)||0)},{k:'Parcela do total',v:pct(i.v,total)}]}));
+  mountCard('area',`${items[0].label} concentra ${pct(items[0].v,total)} da pendência.`,chart,
+    tableView(['Área','Pendência (un)','Ordens pendentes'],items.map(i=>[i.label,fmt(i.v),fmt(cnt.get(i.key)||0)])));
+}
+
+/* ===== Faixas de severidade (rampa ordinal validada) ===== */
+function renderBands(){
+  const rows=rowsFor(['band']).filter(d=>d.pend>0);
+  const counts=BANDS.map(b=>rows.filter(d=>d.pend>=b.lo&&d.pend<=b.hi).length);
+  const total=counts.reduce((a,b)=>a+b,0);
+  if (!total){ mountCard('band','Sem pendência no recorte.',emptyEl('Sem pendência no recorte.'),emptyEl('Sem pendência no recorte.')); return; }
+  const max=Math.max(...counts,1);
+  const chart=h('div',{class:'cols'}, BANDS.map((b,i)=>{
+    const hgt=counts[i]/max*82, isSel=state.band===i;
+    const col=h('div',{class:'col'+(isSel?' sel':'')+(state.band!=null&&!isSel?' dim':''),role:'button',tabindex:'0','aria-pressed':String(isSel),
+      'aria-label':`Faixa ${b.l} unidades: ${counts[i]} ordens. Ativar para filtrar.`,
+      onclick:()=>{ state.band=state.band===i?null:i; state.page=0; update(); }, onkeydown:onKey(()=>{ state.band=state.band===i?null:i; state.page=0; update(); })},
+      h('div',{class:'plot'},h('div',{class:'ccap',style:`bottom:calc(${hgt}% + 4px)`},fmt(counts[i])),h('div',{class:'cbar',style:`height:${hgt}%;background:${BAND_COLOR[i]}`})),
+      h('div',{class:'xl'},b.l+' un'));
+    bindTip(col,{title:`Pendência de ${b.l} un`,rows:[{k:'Ordens',v:fmt(counts[i]),c:BAND_COLOR[i]},{k:'Parcela das pendentes',v:pct(counts[i],total)}]});
+    return col;
+  }));
+  const acima=counts[2]+counts[3];
+  mountCard('band',`${pct(acima,total)} das ordens pendentes passam de 50 un. Clique numa faixa para filtrar.`,chart,
+    tableView(['Faixa (un)','Ordens','% das pendentes'],BANDS.map((b,i)=>[b.l,fmt(counts[i]),pct(counts[i],total)])));
+}
+
+/* ===== Mapa de calor área × componente (rampa sequencial de um só matiz) ===== */
+const RAMP=['#cde2fb','#b7d3f6','#9ec5f4','#86b6ef','#6da7ec','#5598e7','#3987e5','#2a78d6','#256abf','#1c5cab','#184f95','#104281','#0d366b'];
+const hex2=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));
+function heatColor(t){
+  const r=isDark()?[...RAMP].reverse():RAMP, p=Math.max(0,Math.min(1,t))*(r.length-1), i=Math.floor(p), f=p-i;
+  const a=hex2(r[i]), b=hex2(r[Math.min(i+1,r.length-1)]), c=a.map((v,k)=>Math.round(v+(b[k]-v)*f));
+  const lum=(0.2126*c[0]+0.7152*c[1]+0.0722*c[2])/255;
+  return {bg:`rgb(${c.join(',')})`, fg: lum>0.55?'#0b0b0b':'#ffffff'};
+}
+function renderHeat(){
+  const rows=rowsFor(['comp','area']).filter(d=>d.pend>0);
+  if (!rows.length){ mountCard('heat','Sem pendência no recorte.',emptyEl('Sem pendência no recorte.'),emptyEl('Sem pendência no recorte.')); return; }
+  const comps=[...COMPS].map(c=>({c,t:rows.filter(d=>d.comp===c).reduce((a,d)=>a+d.pend,0)})).sort((a,b)=>b.t-a.t).map(x=>x.c);
+  const val=(a,c)=>rows.filter(d=>d.area===a&&d.comp===c).reduce((s,d)=>s+d.pend,0);
+  const cells=[]; let max=0;
+  for (const a of AREAS) for (const c of comps){ const v=val(a,c); cells.push({a,c,v}); if (v>max) max=v; }
+  const topKeys=new Set([...cells].sort((x,y)=>y.v-x.v).slice(0,3).filter(x=>x.v>0).map(x=>x.a+'|'+x.c));
+  const grid=h('div',{class:'heat',style:`grid-template-columns:72px repeat(${comps.length},minmax(60px,1fr)) 64px`});
+  grid.append(h('div'), ...comps.map(c=>h('div',{class:'hh',title:c},c)), h('div',{class:'hh'},'Total'));
+  for (const a of AREAS){
+    grid.append(h('div',{class:'hr'},a));
+    for (const c of comps){
+      const v=val(a,c), col=heatColor(max?v/max:0);
+      const isSel=(state.areas.has(a)&&state.comp===c);
+      const cell=h('button',{class:'cell'+(isSel?' sel':''),style:v>0?`background:${col.bg};color:${col.fg}`:'background:var(--empty)',
+        'aria-label':`${a}, ${c}: ${fmt(v)} unidades pendentes. Ativar para filtrar.`,
+        onclick:()=>{ if (isSel){ state.areas.delete(a); state.comp=''; } else { state.areas=new Set([a]); state.comp=c; } state.page=0; update(); }},
+        topKeys.has(a+'|'+c)?fmt(v):'');
+      bindTip(cell,{title:`${a} · ${c}`,rows:[{k:'Pendência',v:fmt(v)+' un'},{k:'Parcela do total',v:pct(v,rows.reduce((s,d)=>s+d.pend,0))}]});
+      grid.append(cell);
+    }
+    grid.append(h('div',{class:'tot'},fmt(AREAS.length?rows.filter(d=>d.area===a).reduce((s,d)=>s+d.pend,0):0)));
+  }
+  grid.append(h('div',{class:'hr'},'Total'), ...comps.map(c=>h('div',{class:'tot'},fmt(rows.filter(d=>d.comp===c).reduce((s,d)=>s+d.pend,0)))), h('div',{class:'tot'},fmt(rows.reduce((s,d)=>s+d.pend,0))));
+  const ramp=[0,.25,.5,.75,1].map(t=>heatColor(t).bg).join(',');
+  const chart=h('div',{},h('div',{class:'heatwrap'},grid),
+    h('div',{class:'scale'},'0',h('i',{style:`background:linear-gradient(90deg,${ramp})`}),fmt(max)+' un'));
+  const best=[...cells].sort((x,y)=>y.v-x.v)[0];
+  mountCard('heat',`Maior concentração: ${best.c} em ${best.a} (${fmt(best.v)} un). Clique numa célula para filtrar.`,chart,
+    tableView(['Área','Componente','Pendência (un)'],cells.filter(x=>x.v>0).sort((x,y)=>y.v-x.v).map(x=>[x.a,x.c,fmt(x.v)])));
+}
+
+/* ===== Tabela de ordens ===== */
+const ICON={
+  Pendente:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 15 14H1z" fill="var(--warn)"/><path d="M8 6v4M8 11.5v1" stroke="#0b0b0b" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  Zerada:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="var(--good)"/><path d="m4.8 8.2 2.2 2.2 4.2-4.4" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  Excedente:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="var(--serious)"/><path d="M8 11.5v-7M5 7l3-3 3 3" stroke="#0b0b0b" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+};
+function badge(s){ const b=h('span',{class:'badge'}); b.innerHTML=ICON[s]; b.append(document.createTextNode(s)); return b; }  /* ICON é constante interna, não dado externo */
+const COLS=[['ordem','Ordem',0],['area','Área',0],['comp','Componente',0],['nec','Necessária',1],['con','Consumida',1],['pend','Pendente',1],['sit','Situação',0]];
+function renderTable(){
+  const rows=rowsFor([]), {key,dir}=state.sort;
+  const val=d=>key==='sit'?d.pend:d[key];
+  const sorted=[...rows].sort((a,b)=>{ const x=val(a), y=val(b); return (typeof x==='string'?x.localeCompare(y,'pt-BR'):x-y)*dir || a.ordem.localeCompare(b.ordem); });
+  const pages=Math.max(1,Math.ceil(sorted.length/PAGE)); state.page=Math.min(state.page,pages-1);
+  const slice=sorted.slice(state.page*PAGE,state.page*PAGE+PAGE);
+  $('#card-table .insight').textContent=`${fmt(rows.length)} ordens · ${fmt(rows.filter(d=>d.pend>0).length)} com pendência.`;
+  const body=$('#card-table .cbody');
+  if (!rows.length){ body.replaceChildren(emptyEl()); return; }
+  const th=COLS.map(([k,l,n])=>h('th',{class:n?'n':'','aria-sort':key===k?(dir>0?'ascending':'descending'):'none'},
+    h('button',{onclick:()=>{ state.sort = key===k?{key:k,dir:-dir}:{key:k,dir:(n?-1:1)}; state.page=0; renderTable(); }}, l + (key===k?(dir>0?' ▲':' ▼'):''))));
+  const table=h('table',{},h('thead',{},h('tr',{},th)),h('tbody',{},slice.map(d=>h('tr',{},
+    h('td',{},d.ordem),h('td',{},d.area),h('td',{},d.comp),h('td',{class:'n'},fmt(d.nec)),h('td',{class:'n'},fmt(d.con)),
+    h('td',{class:'n'},h('strong',{},fmt(d.pend))),h('td',{},badge(sit(d)))))));
+  const from=state.page*PAGE+1, to=Math.min(sorted.length,from+PAGE-1);
+  body.replaceChildren(h('div',{class:'tscroll'},table),
+    h('div',{class:'pager'},h('span',{},`Mostrando ${fmt(from)}–${fmt(to)} de ${fmt(sorted.length)}`),
+      h('span',{},h('button',{class:'btn',disabled:state.page===0,onclick:()=>{state.page--;renderTable();}},'Anterior'),' ',
+        h('button',{class:'btn',disabled:state.page>=pages-1,onclick:()=>{state.page++;renderTable();}},'Próxima'))));
+}
+$('#csvBtn').addEventListener('click',()=>{
+  const esc=v=>/[",\n]/.test(v)?'"'+String(v).replace(/"/g,'""')+'"':v;
+  const lines=['ordem,area,componente,qtd_necessaria,qtd_consumida,qtd_pendente,situacao',...rowsFor([]).map(d=>[d.ordem,d.area,d.comp,d.nec,d.con,d.pend,sit(d)].map(esc).join(','))];
+  const url=URL.createObjectURL(new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'}));
+  const a=h('a',{href:url,download:'ordens-recorte.csv'}); document.body.append(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
+
+/* ===== Controles de filtro, chips ativos e hash na URL ===== */
+function buildControls(){
+  $('#fArea').replaceChildren(...AREAS.map(a=>h('button',{class:'chip','aria-pressed':'false','data-a':a,onclick:()=>{ state.areas.has(a)?state.areas.delete(a):state.areas.add(a); state.page=0; update(); }},a)));
+  $('#fComp').replaceChildren(h('option',{value:''},'Todos'),...COMPS.map(c=>h('option',{value:c},c)));
+  $('#fComp').onchange=e=>{ state.comp=e.target.value; state.page=0; update(); };
+  $('#fSit').onchange=e=>{ state.sit=e.target.value; state.page=0; update(); };
+  $('#fMin').oninput=e=>{ state.min=Number(e.target.value); state.page=0; update(); };
+  $('#fQ').oninput=e=>{ state.q=e.target.value.trim().toLowerCase(); state.page=0; update(); };
+  $('#clearBtn').onclick=()=>{ Object.assign(state,{areas:new Set(),comp:'',sit:'',min:0,band:null,q:'',page:0}); update(); };
+}
+function syncControls(){
+  document.querySelectorAll('#fArea .chip').forEach(b=>b.setAttribute('aria-pressed',String(state.areas.has(b.dataset.a))));
+  $('#fComp').value=state.comp; $('#fSit').value=state.sit; $('#fMin').value=state.min; $('#fMinV').textContent=state.min;
+  if ($('#fQ').value.trim().toLowerCase()!==state.q) $('#fQ').value=state.q;
+}
+function renderActive(){
+  const tags=[]; const tag=(l,fn)=>tags.push(h('span',{class:'tag'},l,h('button',{'aria-label':'Remover filtro '+l,onclick:fn},'×')));
+  for (const a of state.areas) tag('Área: '+a.replace(/^Área\s*/,''),()=>{state.areas.delete(a);update();});
+  if (state.comp) tag('Componente: '+state.comp,()=>{state.comp='';update();});
+  if (state.sit) tag('Situação: '+state.sit,()=>{state.sit='';update();});
+  if (state.min>0) tag('Pendência ≥ '+state.min+' un',()=>{state.min=0;update();});
+  if (state.band!=null) tag('Faixa: '+BANDS[state.band].l+' un',()=>{state.band=null;update();});
+  if (state.q) tag('Ordem: '+state.q,()=>{state.q='';update();});
+  $('#active').replaceChildren(...(tags.length?[ 'Filtros ativos:', ...tags ]:[ 'Sem filtros: mostrando todas as ordens. Clique nos gráficos para filtrar.' ]));
+}
+function saveHash(){
+  const p=new URLSearchParams();
+  if (state.areas.size) p.set('a',[...state.areas].join('|')); if (state.comp) p.set('c',state.comp); if (state.sit) p.set('s',state.sit);
+  if (state.min) p.set('m',state.min); if (state.band!=null) p.set('b',state.band); if (state.q) p.set('q',state.q);
+  history.replaceState(null,'',p.toString()?'#'+p:location.pathname+location.search);
+}
+function loadHash(){
+  const p=new URLSearchParams(location.hash.slice(1));
+  state.areas=new Set((p.get('a')||'').split('|').filter(a=>AREAS.includes(a)));
+  state.comp=COMPS.includes(p.get('c'))?p.get('c'):''; state.sit=['Pendente','Zerada','Excedente'].includes(p.get('s'))?p.get('s'):'';
+  state.min=Math.max(0,Math.min(150,Number(p.get('m'))||0)); const b=p.get('b'); state.band=(b!=null&&BANDS[Number(b)])?Number(b):null; state.q=(p.get('q')||'').toLowerCase();
+}
+
+/* ===== Orquestração ===== */
+function render(){
+  syncControls(); renderActive(); renderKPIs(rowsFor([]));
+  renderTop(); renderArea(); renderBands(); renderHeat(); renderTable();
+}
+function update(){ hideTip(); render(); saveHash(); }
+function setData(csv, label){
+  DATA=toData(parseCSV(csv));
+  AREAS=[...new Set(DATA.map(d=>d.area))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  COMPS=[...new Set(DATA.map(d=>d.comp))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  $('#source').textContent=label;
+}
+async function load(){
+  const app=$('#app'); app.classList.add('loading');
+  let csv=EMBEDDED_CSV, label='Fonte: snapshot embutido da aba ordens.';
+  if (SHEET_CSV_URL){
+    try{
+      const r=await fetch(SHEET_CSV_URL,{cache:'no-store'}); if(!r.ok) throw new Error(r.status);
+      csv=await r.text(); label='Fonte: Google Sheets ao vivo, carregado às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'.';
+    }catch(e){ label='Fonte: snapshot embutido (falha ao ler o Google Sheets).'; }
+  }
+  setData(csv,label); app.classList.remove('loading');
+}
+(async function init(){
+  await load(); buildControls(); loadHash(); render();
+  if (SHEET_CSV_URL){ const b=$('#refreshBtn'); b.hidden=false; b.onclick=async()=>{ await load(); loadHash(); buildControls(); update(); }; }
+  addEventListener('hashchange',()=>{ loadHash(); render(); });
+})();
+</script>
+</body>
+</html>
