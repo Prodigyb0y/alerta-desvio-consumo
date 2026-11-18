@@ -30,8 +30,10 @@ O assunto de cada e-mail leva o prefixo da ferramenta que escreveu a linha: `[N8
 ## Limitações dos planos gratuitos
 
 - Make: 1.000 créditos/mês, 2 cenários ativos, agendamento mínimo de 15 min.
-- Zapier: 100 tarefas/mês, Zaps de duas etapas. O gatilho "nova linha" pode demorar até 15 min.
-- n8n: a confirmar na Fase 0.
+- Zapier: o projeto foi desenhado para o plano gratuito (100 tarefas/mês, Zaps de duas etapas). Na construção, a conta está em teste do plano Pro, que expira em 02/12/2026. O gatilho "nova linha" pode demorar até 15 min.
+- n8n: teste gratuito de 14 dias do n8n Cloud, com 1.000 execuções. O fluxo é exportado em `n8n/workflow.json`.
+
+Detalhes em [`docs/planos.md`](docs/planos.md).
 
 ## Status
 
