@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Gera docs/index.html (dashboard HTML autocontido) a partir de
-dashboard/template.html + dados/ordens.csv.
+dashboard/template-bi.html + dados/ordens.csv.
 
 O CSV vai embutido no HTML como snapshot, então a página funciona sem
 servidor e sem instalação. Para dados ao vivo, preencha SHEET_CSV_URL no
@@ -11,7 +11,7 @@ Uso: python3 scripts/build_dashboard.py
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
-TEMPLATE = RAIZ / "dashboard" / "template.html"
+TEMPLATE = RAIZ / "dashboard" / "template-bi.html"
 CSV = RAIZ / "dados" / "ordens.csv"
 SAIDA = RAIZ / "docs" / "index.html"
 

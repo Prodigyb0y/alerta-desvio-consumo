@@ -22,16 +22,15 @@ Página única, sem servidor e sem instalação: [`docs/index.html`](docs/index.
 
 - Demo pública (GitHub Pages): https://prodigyb0y.github.io/alerta-desvio-consumo/
 - Os dados vão embutidos como snapshot. Para ler ao vivo da aba `ordens`, publique a aba como CSV no Google Sheets (Arquivo > Compartilhar > Publicar na web) e cole a URL em `SHEET_CSV_URL` no HTML.
-- Para regenerar a página depois de mudar o CSV: `python3 scripts/build_dashboard.py` (usa `dashboard/template.html`).
+- Para regenerar a página depois de mudar o CSV: `python3 scripts/build_dashboard.py` (usa `dashboard/template-bi.html`).
 
 ## Estrutura do repositório
 
 | Pasta | Conteúdo |
 |---|---|
 | `dados/` | CSV gerado |
-| `dashboard/` | Template do dashboard HTML |
-| `scripts/` | `gerar_dados.py`, `gerar_dashboard.py` e cálculo de referência em Python |
-| `dashboard/` | `template.html` e o `index.html` gerado (dashboard) |
+| `dashboard/` | `template.html` e `index.html` (versão simples) e `template-bi.html` (versão completa, publicada em `docs/index.html`) |
+| `scripts/` | `gerar_dados.py`, `gerar_dashboard.py` (versão simples), `build_dashboard.py` (versão completa) e cálculo de referência em Python |
 | `n8n/` | `workflow.json` exportado |
 | `make/` | Blueprint exportado |
 | `zapier/` | Descrição do Zap |
