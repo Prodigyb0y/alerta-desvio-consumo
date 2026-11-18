@@ -310,7 +310,7 @@ footer{margin-top:20px;font-size:12px;color:var(--ink2);display:flex;flex-wrap:w
    SHEET_CSV_URL vazio  -> usa o snapshot embutido abaixo (funciona offline).
    SHEET_CSV_URL com URL -> carrega ao vivo da aba "ordens" publicada na web
    (Google Sheets > Arquivo > Compartilhar > Publicar na web > aba ordens > CSV). */
-const SHEET_CSV_URL = "";
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRn9x_rPnJzmVOqnCZef35Zmf8m90rvZUIz9cPE1-Pgj_ThyKgFdX90GugupeyJ_5kLbAA2EFlbAqDk/pub?gid=880285063&single=true&output=csv";
 const EMBEDDED_CSV = `ordem,area,componente,qtd_necessaria,qtd_consumida,qtd_pendente,email_responsavel
 OP-0001,Área C,Parafuso M8,337,223,114,gutenberg.demo.operacoes@gmail.com
 OP-0002,Área C,Correia dentada,135,98,37,gutenberg.demo.operacoes@gmail.com
@@ -837,8 +837,10 @@ async function load(){
   if (SHEET_CSV_URL){
     try{
       const r=await fetch(SHEET_CSV_URL,{cache:'no-store'}); if(!r.ok) throw new Error(r.status);
-      csv=await r.text(); label='Fonte: Google Sheets ao vivo, carregado às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'.';
-    }catch(e){ label='Fonte: snapshot embutido (falha ao ler o Google Sheets).'; }
+      const live=await r.text();
+      if (!toData(parseCSV(live)).length) throw new Error('sem colunas esperadas');
+      csv=live; label='Fonte: Google Sheets ao vivo, carregado às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'.';
+    }catch(e){ label='Fonte: snapshot embutido (não foi possível ler o Google Sheets agora).'; }
   }
   setData(csv,label); app.classList.remove('loading');
 }
