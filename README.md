@@ -12,7 +12,7 @@ Fluxo ponta a ponta para detectar pendências de consumo em ordens de produção
 2. **Google Sheets, aba `resumo`**: uma linha por execução com `data_execucao`, `ferramenta`, `total_pendentes`, `soma_pendente`, `top5_componentes`, `link_dashboard`.
 3. **n8n ou Make** calculam o resumo e escrevem uma linha na aba `resumo`. Nunca os dois ativos ao mesmo tempo.
 4. **Zapier** (sempre ligado) é só o notificador, em duas etapas: gatilho "nova linha" na aba `resumo` → Gmail "enviar e-mail". Ele não agrega nada.
-5. **Looker Studio** conectado à aba `ordens`.
+5. **Dashboard em HTML** (`dashboard/index.html`), publicado no GitHub Pages. Mostra o total de pendentes, os 10 componentes com maior pendência, a pendência por área e a tabela de ordens. Lê um snapshot de `dados/ordens.csv` embutido na página e, se configurado, o CSV publicado da aba `ordens`.
 
 O assunto de cada e-mail leva o prefixo da ferramenta que escreveu a linha: `[N8N]`, `[MAKE]` ou `[ZAPIER]`.
 
@@ -21,7 +21,8 @@ O assunto de cada e-mail leva o prefixo da ferramenta que escreveu a linha: `[N8
 | Pasta | Conteúdo |
 |---|---|
 | `dados/` | CSV gerado |
-| `scripts/` | `gerar_dados.py` e cálculo de referência em Python |
+| `scripts/` | `gerar_dados.py`, `gerar_dashboard.py` e cálculo de referência em Python |
+| `dashboard/` | `template.html` e o `index.html` gerado (dashboard) |
 | `n8n/` | `workflow.json` exportado |
 | `make/` | Blueprint exportado |
 | `zapier/` | Descrição do Zap |
@@ -38,8 +39,8 @@ Detalhes em [`docs/planos.md`](docs/planos.md).
 ## Status
 
 - [x] Fase 0: estrutura do repositório
-- [ ] Fase 1: dados
-- [ ] Fase 2: dashboard
+- [x] Fase 1: dados
+- [ ] Fase 2: dashboard em HTML (construído; falta publicar no GitHub Pages)
 - [ ] Fase 3: cálculo com n8n
 - [ ] Fase 4: cálculo com Make
 - [ ] Fase 5: notificação com Zapier

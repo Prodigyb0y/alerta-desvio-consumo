@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alerta de desvio de consumo | Gutenberg Systems</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink2: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --s1: #2a78d6;
+    --s1-mute: #c3c2b7;
+    --border: rgba(11, 11, 11, 0.10);
+    --wash: rgba(11, 11, 11, 0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page: #0d0d0d;
+      --surface: #1a1a19;
+      --ink: #f0efec;
+      --ink2: #c3c2b7;
+      --muted: #898781;
+      --grid: #2c2c2a;
+      --axis: #383835;
+      --s1: #3987e5;
+      --s1-mute: #4a4a47;
+      --border: rgba(255, 255, 255, 0.10);
+      --wash: rgba(255, 255, 255, 0.06);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 20px 40px; }
+  header { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
+  h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .sub { color: var(--ink2); margin: 0; max-width: 62ch; }
+  .source { color: var(--ink2); font-size: 12px; text-align: right; }
+
+  .filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-bottom: 16px; }
+  .filters label { color: var(--ink2); font-size: 13px; }
+  select, input[type="search"], button {
+    font: inherit; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px;
+  }
+  select:focus-visible, input:focus-visible, button:focus-visible, .row:focus-visible {
+    outline: 2px solid var(--s1); outline-offset: 2px;
+  }
+  button { cursor: pointer; }
+  button:hover { background: var(--wash); }
+  .link { border: 0; background: none; padding: 7px 4px; color: var(--ink2); text-decoration: underline; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px 20px; }
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+  .kpi .lbl { color: var(--ink2); font-size: 13px; }
+  .kpi .val { font-size: 36px; font-weight: 600; line-height: 1.15; margin: 4px 0 2px; letter-spacing: -0.02em; }
+  .kpi .note { color: var(--ink2); font-size: 13px; }
+
+  .charts { display: grid; grid-template-columns: 3fr 2fr; gap: 16px; margin-bottom: 16px; align-items: start; }
+  .card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+  h2 { font-size: 15px; font-weight: 600; margin: 0 0 2px; }
+  .hint { color: var(--ink2); font-size: 12.5px; margin: 0; }
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; flex: none; }
+  .seg button { border: 0; border-radius: 0; padding: 4px 10px; font-size: 12.5px; background: transparent; color: var(--ink2); }
+  .seg button[aria-pressed="true"] { background: var(--wash); color: var(--ink); font-weight: 600; }
+
+  .bars { border-left: 1px solid var(--axis); }
+  .row { display: grid; grid-template-columns: minmax(96px, 168px) 1fr; align-items: center; gap: 12px; padding: 5px 0 5px 12px; border-radius: 0 6px 6px 0; }
+  .row .lbl { color: var(--ink2); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row .track { display: flex; align-items: center; min-width: 0; }
+  .row .bar { height: 16px; border-radius: 0 4px 4px 0; background: var(--s1); flex: none; transition: filter .12s; }
+  .row.mute .bar { background: var(--s1-mute); }
+  .row .num { margin-left: 8px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .row:hover .bar, .row:focus-visible .bar { filter: brightness(1.14); }
+  .row[role="button"] { cursor: pointer; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--grid); text-align: left; }
+  th { color: var(--ink2); font-weight: 600; font-size: 12.5px; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:hover { background: var(--wash); }
+  .tablebar { display: flex; flex-wrap: wrap; gap: 10px 12px; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .more { display: flex; align-items: center; gap: 12px; margin-top: 12px; color: var(--ink2); font-size: 13px; }
+
+  #tip {
+    position: fixed; z-index: 10; pointer-events: none; display: none;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 10px; font-size: 12.5px; box-shadow: 0 4px 16px rgba(0,0,0,.14);
+    max-width: 260px;
+  }
+  #tip .v { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  #tip .k { width: 12px; height: 3px; border-radius: 2px; background: var(--s1); flex: none; }
+  #tip .s { color: var(--ink2); }
+  footer { color: var(--ink2); font-size: 12.5px; margin-top: 22px; }
+  footer a { color: inherit; }
+
+  @media (max-width: 860px) {
+    .kpis { grid-template-columns: 1fr; }
+    .charts { grid-template-columns: 1fr; }
+    .source { text-align: left; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Alerta de desvio de consumo</h1>
+      <p class="sub">Gutenberg Systems, dados fictícios. Pendência = quantidade necessária − quantidade consumida; só conta quando for maior que zero.</p>
+    </div>
+    <div class="source" id="source"></div>
+  </header>
+
+  <div class="filters">
+    <label for="areaSel">Área</label>
+    <select id="areaSel">
+      <option value="">Todas</option>
+      <option>Área A</option>
+      <option>Área B</option>
+      <option>Área C</option>
+    </select>
+    <button class="link" id="clearBtn" hidden>Limpar filtro</button>
+  </div>
+
+  <section class="kpis" aria-label="Indicadores">
+    <div class="card kpi"><div class="lbl">Ordens com pendência</div><div class="val" id="kCount">-</div><div class="note" id="kCountNote"></div></div>
+    <div class="card kpi"><div class="lbl">Quantidade pendente</div><div class="val" id="kSum">-</div><div class="note">unidades ainda por consumir</div></div>
+    <div class="card kpi"><div class="lbl">Maior pendência</div><div class="val" id="kMax">-</div><div class="note" id="kMaxNote"></div></div>
+  </section>
+
+  <section class="charts">
+    <div class="card">
+      <div class="card-head">
+        <div><h2>Os 10 componentes com maior pendência</h2><p class="hint" id="topHint">Soma da quantidade pendente</p></div>
+        <div class="seg" data-chart="top"><button aria-pressed="true" data-v="chart">Gráfico</button><button aria-pressed="false" data-v="table">Tabela</button></div>
+      </div>
+      <div id="topBody"></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><h2>Pendência por área</h2><p class="hint">Clique em uma barra para filtrar</p></div>
+        <div class="seg" data-chart="area"><button aria-pressed="true" data-v="chart">Gráfico</button><button aria-pressed="false" data-v="table">Tabela</button></div>
+      </div>
+      <div id="areaBody"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="tablebar">
+      <div><h2>Ordens com pendência</h2><p class="hint" id="tblHint"></p></div>
+      <input type="search" id="q" placeholder="Buscar ordem ou componente" aria-label="Buscar ordem ou componente" size="28">
+    </div>
+    <table>
+      <thead><tr><th>Ordem</th><th>Área</th><th>Componente</th><th class="n">Pendente</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="more"><span id="moreInfo"></span><button id="moreBtn" hidden>Mostrar mais</button></div>
+  </section>
+
+  <footer>
+    Código e dados em <a href="https://github.com/Prodigyb0y/alerta-desvio-consumo">github.com/Prodigyb0y/alerta-desvio-consumo</a>.
+  </footer>
+</div>
+<div id="tip" role="tooltip"></div>
+
+<script>
+// Configuração. Deixe CSV_URL vazio para usar só o snapshot embutido.
+// Para dados ao vivo: Arquivo > Compartilhar > Publicar na Web (aba "ordens", formato CSV) e cole o link aqui.
+const CONFIG = { CSV_URL: "", SNAPSHOT_DATE: "__DATE__" };
+// Snapshot de dados/ordens.csv: [ordem, area, componente, qtd_necessaria, qtd_consumida]
+const EMBEDDED = __DATA__;
+
+const fmt = n => n.toLocaleString("pt-BR");
+const state = { area: "", q: "", shown: 15, view: { top: "chart", area: "chart" } };
+let ROWS = [];
+
+function toRows(list) {
+  return list.map(([ordem, area, componente, nec, cons]) => ({ ordem, area, componente, nec, cons, pend: nec - cons }));
+}
+
+function parseCSV(text) {
+  const out = []; let row = [], cur = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) {
+      if (c === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c;
+    } else if (c === '"') q = true;
+    else if (c === ",") { row.push(cur); cur = ""; }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && text[i + 1] === "\n") i++; row.push(cur); out.push(row); row = []; cur = ""; }
+    else cur += c;
+  }
+  if (cur !== "" || row.length) { row.push(cur); out.push(row); }
+  return out.filter(r => r.length > 1);
+}
+
+function fromCSV(text) {
+  const [head, ...body] = parseCSV(text);
+  const ix = n => head.indexOf(n);
+  const need = ["ordem", "area", "componente", "qtd_necessaria", "qtd_consumida"].map(ix);
+  if (need.some(i => i < 0)) throw new Error("colunas ausentes");
+  return toRows(body.map(r => [r[need[0]], r[need[1]], r[need[2]], Number(r[need[3]]), Number(r[need[4]])]));
+}
+
+function groupSum(rows, key) {
+  const m = new Map();
+  for (const r of rows) {
+    const g = m.get(r[key]) || { name: r[key], sum: 0, count: 0 };
+    g.sum += r.pend; g.count++; m.set(r[key], g);
+  }
+  return [...m.values()].sort((a, b) => b.sum - a.sum);
+}
+
+/* tooltip */
+const tip = document.getElementById("tip");
+function showTip(html, x, y) {
+  tip.replaceChildren(...html);
+  tip.style.display = "block";
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  tip.style.left = Math.min(x + 14, innerWidth - w - 8) + "px";
+  tip.style.top = Math.max(8, Math.min(y + 14, innerHeight - h - 8)) + "px";
+}
+function hideTip() { tip.style.display = "none"; }
+function tipContent(value, line1, line2) {
+  const v = document.createElement("div"); v.className = "v";
+  const k = document.createElement("span"); k.className = "k";
+  const t = document.createElement("span"); t.textContent = value;
+  v.append(k, t);
+  const a = document.createElement("div"); a.className = "s"; a.textContent = line1;
+  const b = document.createElement("div"); b.className = "s"; b.textContent = line2;
+  return [v, a, b];
+}
+
+function barRow(item, max, total, opts = {}) {
+  const row = document.createElement("div");
+  row.className = "row" + (opts.mute ? " mute" : "");
+  row.setAttribute("role", opts.onClick ? "button" : "listitem");
+  row.tabIndex = 0;
+  const share = total ? Math.round((item.sum / total) * 100) : 0;
+  const label = `${item.name}: ${fmt(item.sum)} unidades pendentes em ${item.count} ordens (${share}% do total mostrado)`;
+  row.setAttribute("aria-label", label);
+  if (opts.onClick) row.setAttribute("aria-pressed", String(!!opts.pressed));
+  const lbl = document.createElement("span"); lbl.className = "lbl"; lbl.textContent = item.name; lbl.title = item.name;
+  const track = document.createElement("div"); track.className = "track";
+  const bar = document.createElement("div"); bar.className = "bar";
+  bar.style.width = Math.max(2, (item.sum / max) * 82) + "%";
+  const num = document.createElement("span"); num.className = "num"; num.textContent = fmt(item.sum);
+  track.append(bar, num); row.append(lbl, track);
+  const content = () => tipContent(fmt(item.sum) + " un. pendentes", item.name, `${item.count} ordens · ${share}% do total mostrado`);
+  row.addEventListener("pointermove", e => showTip(content(), e.clientX, e.clientY));
+  row.addEventListener("pointerleave", hideTip);
+  row.addEventListener("focus", () => { const r = row.getBoundingClientRect(); showTip(content(), r.left + 60, r.top); });
+  row.addEventListener("blur", hideTip);
+  if (opts.onClick) {
+    row.addEventListener("click", opts.onClick);
+    row.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); opts.onClick(); } });
+  }
+  return row;
+}
+
+function simpleTable(cols, rows) {
+  const t = document.createElement("table");
+  const th = document.createElement("thead"), hr = document.createElement("tr");
+  cols.forEach((c, i) => { const h = document.createElement("th"); h.textContent = c; if (i > 0) h.className = "n"; hr.append(h); });
+  th.append(hr); t.append(th);
+  const tb = document.createElement("tbody");
+  rows.forEach(r => { const tr = document.createElement("tr"); r.forEach((v, i) => { const td = document.createElement("td"); td.textContent = v; if (i > 0) td.className = "n"; tr.append(td); }); tb.append(tr); });
+  t.append(tb); return t;
+}
+
+function setArea(v) { state.area = v; state.shown = 15; document.getElementById("areaSel").value = v; render(); }
+
+function render() {
+  const inArea = ROWS.filter(r => !state.area || r.area === state.area);
+  const pend = inArea.filter(r => r.pend > 0);
+  const total = pend.reduce((s, r) => s + r.pend, 0);
+
+  document.getElementById("clearBtn").hidden = !state.area;
+  document.getElementById("kCount").textContent = fmt(pend.length);
+  document.getElementById("kCountNote").textContent = `de ${fmt(inArea.length)} ordens (${inArea.length ? Math.round(pend.length / inArea.length * 100) : 0}%)`;
+  document.getElementById("kSum").textContent = fmt(total);
+  const top = pend.reduce((a, r) => (!a || r.pend > a.pend ? r : a), null);
+  document.getElementById("kMax").textContent = top ? fmt(top.pend) : "-";
+  document.getElementById("kMaxNote").textContent = top ? `${top.ordem} · ${top.componente}` : "";
+
+  // Top 10 componentes (escopo: filtro de área)
+  const comps = groupSum(pend, "componente").slice(0, 10);
+  const topBody = document.getElementById("topBody");
+  document.getElementById("topHint").textContent = "Soma da quantidade pendente" + (state.area ? ` em ${state.area}` : "");
+  if (state.view.top === "table") {
+    topBody.replaceChildren(simpleTable(["Componente", "Pendente", "Ordens"], comps.map(c => [c.name, fmt(c.sum), fmt(c.count)])));
+  } else {
+    const wrap = document.createElement("div"); wrap.className = "bars"; wrap.setAttribute("role", "list");
+    const max = comps.length ? comps[0].sum : 1;
+    comps.forEach(c => wrap.append(barRow(c, max, total)));
+    topBody.replaceChildren(wrap);
+  }
+
+  // Pendência por área (sempre as três áreas; a selecionada fica em destaque)
+  const allPend = ROWS.filter(r => r.pend > 0);
+  const areas = groupSum(allPend, "area").sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+  const allTotal = allPend.reduce((s, r) => s + r.pend, 0);
+  const areaBody = document.getElementById("areaBody");
+  if (state.view.area === "table") {
+    areaBody.replaceChildren(simpleTable(["Área", "Pendente", "Ordens"], areas.map(c => [c.name, fmt(c.sum), fmt(c.count)])));
+  } else {
+    const wrap = document.createElement("div"); wrap.className = "bars"; wrap.setAttribute("role", "list");
+    const max = Math.max(...areas.map(a => a.sum), 1);
+    areas.forEach(a => wrap.append(barRow(a, max, allTotal, {
+      mute: !!state.area && state.area !== a.name,
+      pressed: state.area === a.name,
+      onClick: () => setArea(state.area === a.name ? "" : a.name)
+    })));
+    areaBody.replaceChildren(wrap);
+  }
+
+  // Tabela de detalhe
+  const q = state.q.trim().toLowerCase();
+  const list = pend.filter(r => !q || r.ordem.toLowerCase().includes(q) || r.componente.toLowerCase().includes(q)).sort((a, b) => b.pend - a.pend || a.ordem.localeCompare(b.ordem));
+  const tbody = document.getElementById("tbody");
+  tbody.replaceChildren(...list.slice(0, state.shown).map(r => {
+    const tr = document.createElement("tr");
+    [r.ordem, r.area, r.componente, fmt(r.pend)].forEach((v, i) => { const td = document.createElement("td"); td.textContent = v; if (i === 3) td.className = "n"; tr.append(td); });
+    return tr;
+  }));
+  document.getElementById("tblHint").textContent = "Ordenadas da maior para a menor pendência";
+  const shown = Math.min(state.shown, list.length);
+  document.getElementById("moreInfo").textContent = list.length ? `Mostrando ${fmt(shown)} de ${fmt(list.length)}` : "Nenhuma ordem encontrada";
+  document.getElementById("moreBtn").hidden = shown >= list.length;
+}
+
+function setSource(text) { document.getElementById("source").textContent = text; }
+
+document.getElementById("areaSel").addEventListener("change", e => setArea(e.target.value));
+document.getElementById("clearBtn").addEventListener("click", () => setArea(""));
+document.getElementById("q").addEventListener("input", e => { state.q = e.target.value; state.shown = 15; render(); });
+document.getElementById("moreBtn").addEventListener("click", () => { state.shown += 25; render(); });
+document.querySelectorAll(".seg").forEach(seg => seg.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  state.view[seg.dataset.chart] = b.dataset.v;
+  seg.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  render();
+}));
+
+ROWS = toRows(EMBEDDED);
+setSource(`Fonte: snapshot dos dados (${CONFIG.SNAPSHOT_DATE})`);
+render();
+
+if (CONFIG.CSV_URL) {
+  fetch(CONFIG.CSV_URL).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+    .then(t => { ROWS = fromCSV(t); setSource("Fonte: Google Sheets (publicado na web)"); render(); })
+    .catch(() => setSource(`Google Sheets indisponível; mostrando o snapshot de ${CONFIG.SNAPSHOT_DATE}`));
+}
+</script>
+</body>
+</html>
