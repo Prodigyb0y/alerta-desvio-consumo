@@ -12,7 +12,7 @@ Fluxo ponta a ponta para detectar pendências de consumo em ordens de produção
 2. **Google Sheets, aba `resumo`**: uma linha por execução com `data_execucao`, `ferramenta`, `total_pendentes`, `soma_pendente`, `top5_componentes`, `link_dashboard`.
 3. **n8n ou Make** calculam o resumo e escrevem uma linha na aba `resumo`. Nunca os dois ativos ao mesmo tempo.
 4. **Zapier** (sempre ligado) é só o notificador, em duas etapas: gatilho "nova linha" na aba `resumo` → Gmail "enviar e-mail". Ele não agrega nada.
-5. **Dashboard em HTML** (`dashboard/index.html`), publicado no GitHub Pages. Mostra o total de pendentes, os 10 componentes com maior pendência, a pendência por área e a tabela de ordens. Lê um snapshot de `dados/ordens.csv` embutido na página e, se configurado, o CSV publicado da aba `ordens`.
+5. **Dashboard em HTML** (`docs/index.html`), publicado no GitHub Pages, no lugar do Looker Studio. Lê a aba `ordens` do Google Sheets pelo CSV publicado na web e, se a leitura falhar, usa um snapshot de `dados/ordens.csv` embutido na página.
 
 O assunto de cada e-mail leva o prefixo da ferramenta que escreveu a linha: `[N8N]`, `[MAKE]` ou `[ZAPIER]`.
 
@@ -21,16 +21,16 @@ O assunto de cada e-mail leva o prefixo da ferramenta que escreveu a linha: `[N8
 Página única, sem servidor e sem instalação: [`docs/index.html`](docs/index.html). Ela traz indicadores (ordens com pendência, soma pendente, maior pendência, consumo vs. necessário), Top 10 de componentes, pendência por área, faixas de severidade, mapa de calor área × componente e a tabela de ordens, com filtros por área, componente, situação, pendência mínima e busca por ordem. Clicar num gráfico filtra todos os outros; o recorte fica na URL e pode ser baixado em CSV. Tema claro e escuro, e cada gráfico tem uma visão em tabela.
 
 - Demo pública (GitHub Pages): https://prodigyb0y.github.io/alerta-desvio-consumo/
-- Os dados vão embutidos como snapshot. Para ler ao vivo da aba `ordens`, publique a aba como CSV no Google Sheets (Arquivo > Compartilhar > Publicar na web) e cole a URL em `SHEET_CSV_URL` no HTML.
-- Para regenerar a página depois de mudar o CSV: `python3 scripts/build_dashboard.py` (usa `dashboard/template-bi.html`).
+- Os dados vêm da aba `ordens` do Google Sheets, publicada na web como CSV (Arquivo > Compartilhar > Publicar na web). A URL fica em `SHEET_CSV_URL` no `dashboard/template.html`. Um snapshot de `dados/ordens.csv` vai embutido como reserva.
+- Para regenerar a página depois de mudar o CSV: `python3 scripts/build_dashboard.py` (usa `dashboard/template.html`).
 
 ## Estrutura do repositório
 
 | Pasta | Conteúdo |
 |---|---|
 | `dados/` | CSV gerado |
-| `dashboard/` | `template.html` e `index.html` (versão simples) e `template-bi.html` (versão completa, publicada em `docs/index.html`) |
-| `scripts/` | `gerar_dados.py`, `gerar_dashboard.py` (versão simples), `build_dashboard.py` (versão completa) e cálculo de referência em Python |
+| `dashboard/` | `template.html`, o modelo do dashboard |
+| `scripts/` | `gerar_dados.py`, `build_dashboard.py` e cálculo de referência em Python |
 | `n8n/` | `workflow.json` exportado |
 | `make/` | Blueprint exportado |
 | `zapier/` | Descrição do Zap |
