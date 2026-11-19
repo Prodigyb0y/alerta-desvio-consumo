@@ -55,7 +55,7 @@ Dashboard HTML (GitHub Pages) ◄── lê a aba "ordens" publicada como CSV
 1. **Base:** 200 ordens com `ordem, area, componente, qtd_necessaria, qtd_consumida, qtd_pendente, email_responsavel`. Na planilha, a coluna H `qtd_pendente_calc` é `qtd_necessaria − qtd_consumida`. Pendente é quando o valor é maior que zero.
 2. **Cálculo:** n8n **ou** Make leem `ordens`, filtram `H > 0` e gravam uma linha em `resumo` com `data_execucao, ferramenta, total_pendentes, soma_pendente, top5_componentes, link_dashboard`. O gatilho é manual, por ser uma demonstração.
 3. **Notificação:** o Zapier detecta a linha nova e envia o e-mail. Ele não agrega, não filtra e não calcula nada: só repassa os campos da linha. O assunto leva o prefixo da ferramenta que calculou (`[N8N]` ou `[MAKE]`).
-4. **Dashboard:** indicadores, Top 10 de componentes, pendência por área, mapa de calor área × componente e tabela de ordens, com filtros cruzados, tema claro e escuro e visão em tabela de cada gráfico.
+4. **Dashboard:** barra lateral com a marca e os filtros, cinco indicadores (incluindo "Necessário já consumido", que não deixa o consumo a mais de uma ordem esconder a pendência de outra), matriz componente × área (barra de total e mapa de calor com todos os números), pendência por área, faixas de pendência e tabela de ordens, com filtros cruzados, tema claro e escuro, visão em tabela de cada gráfico e indicação de quando os dados vieram do Google Sheets ao vivo ou do snapshot. Só para computador (tela a partir de 1280 px).
 
 ## Resultado de referência
 
@@ -106,7 +106,7 @@ Detalhes da cronometragem e pendências em [`docs/resultados.md`](docs/resultado
 |---|---|
 | `dados/` | `ordens.csv`, a base fictícia |
 | `scripts/` | Geração dos dados, cálculo de referência e build do dashboard |
-| `dashboard/` | `template.html`, o modelo do dashboard |
+| `dashboard/` | `template.html` (modelo do dashboard, só para computador) e `assets/` (logo e ícone da marca) |
 | `n8n/` | `workflow.json`, o fluxo exportado |
 | `make/` | Blueprint do cenário Make e como importar |
 | `zapier/` | Descrição do Zap (etapas, campos, assunto e corpo) |
@@ -127,5 +127,7 @@ Detalhes da cronometragem e pendências em [`docs/resultados.md`](docs/resultado
 - **Aba `resumo`:** ao apagar linhas dela, desligue e ligue o Zap, senão a próxima linha nova pode não disparar o e-mail (ver [`zapier/README.md`](zapier/README.md)).
 - **Amostra pequena:** 4 linhas em `resumo` e 2 medições de atraso. Os números acima servem para validar o fluxo, não para estimar desempenho.
 - **Dados públicos:** a aba `ordens` é publicada como CSV para o dashboard ler. É seguro porque os dados são fictícios.
+- **Só para computador:** o dashboard foi desenhado para telas a partir de 1280 px. Não há versão para tablet ou celular.
+- **Acessibilidade:** contraste, teclado e árvore de acessibilidade foram verificados, mas o dashboard não foi testado com leitor de tela real (ver [`docs/evidencias.md`](docs/evidencias.md), fase 7).
 
-Decisões de projeto (por que HTML no lugar do Looker Studio, gatilho manual e prefixo do assunto) em [`docs/decisoes.md`](docs/decisoes.md).
+Decisões de projeto (por que HTML no lugar do Looker Studio, gatilho manual, prefixo do assunto e o redesenho do dashboard) em [`docs/decisoes.md`](docs/decisoes.md).

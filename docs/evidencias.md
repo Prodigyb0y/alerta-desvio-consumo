@@ -46,3 +46,13 @@ Planos conferidos nos painéis de Make, Zapier e n8n. Detalhes em [`planos.md`](
 - Limpeza da aba `resumo`: as linhas de teste foram apagadas e ficaram a execução do n8n (21:16:08) e a do Make (21:23:49), ambas no formato novo do top 5.
 - Efeito colateral encontrado: depois de apagar linhas, a linha nova do n8n (21:33:58, linha 4) não disparou o Zap em 16 minutos, porque o Zapier já tinha visto linhas até o número 7. Desligar e ligar o Zap resolveu: a linha 5 (n8n, 21:50:24) gerou a execução das 21:52:45 (Successful, 1 tarefa, e-mail `[N8N]`). A linha 4 permanece na aba sem e-mail. Documentado em `zapier/README.md`.
 - Dashboard conferido em janela anônima (https://prodigyb0y.github.io/alerta-desvio-consumo/): carrega sem login, com 149 ordens com pendência, 7.981 un. de soma e maior pendência de 174 un. (OP-0075 · Rolamento 6204). Print em `docs/img/dashboard.png`.
+
+## Fase 7: redesenho do dashboard e verificações (19/11/2026)
+- Novo layout só para computador, matriz componente × área e indicador "Necessário já consumido" (84,9%, no lugar de 86,7%). Motivos em [`decisoes.md`](decisoes.md).
+- **Leitura ao vivo:** testada pelo navegador do app, a partir de https://prodigyb0y.github.io: HTTP 200, 200 linhas, 149 ordens com pendência, soma 7.981, maior pendência 174 e 49 com consumo a mais, iguais ao `dados/ordens.csv`. A planilha publicada tem a coluna extra `qtd_pendente_calc`, que a página ignora.
+- **Renderização:** Chrome sem interface em 1280, 1440 e 1920 px, nos temas claro e escuro, sem erro de JavaScript e sem rolagem horizontal. Números do topo conferidos: 149, 7.981, 174, 84,9% e 49.
+- **Contraste:** verificação automática de todo o texto visível. Antes do ajuste, 1 célula do mapa ficava em 4,46:1; depois, 0 falhas nos dois temas. As cores das faixas de pendência e os ícones de situação foram ajustados para pelo menos 3:1 contra o fundo.
+- **Teclado:** todos os controles têm foco visível; a matriz tem muitas paradas de Tab, por isso há o atalho "Pular para a tabela de ordens" (conferido: o foco vai para a tabela).
+- **Árvore de acessibilidade** conferida no Chromium (títulos, nomes dos controles, estado dos filtros). **Não** foi testado com leitor de tela real (NVDA, VoiceOver) nem com pessoas.
+- **Daltonismo:** simulação de deuteranopia e protanopia sobre a captura da página; a paleta de um matiz e os números escritos mantêm a leitura. Sem teste com pessoas.
+- A captura `docs/img/dashboard.png` foi substituída pela da nova versão. Foi tirada com o CSV do repositório servido no lugar da planilha, que tem os mesmos totais.

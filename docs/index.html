@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Alerta de desvio de consumo · Gutenberg Systems</title>
+<meta name="description" content="Pendências de consumo por ordem de produção. Dados fictícios.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%20width%3D%2264%22%20height%3D%2264%22%3E%0A%20%20%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%23d9482b%22/%3E%0A%20%20%3Crect%20x%3D%2211%22%20y%3D%2211%22%20width%3D%2242%22%20height%3D%2242%22%20rx%3D%228%22%20fill%3D%22%230b0b0b%22/%3E%0A%20%20%3Ctext%20x%3D%2232%22%20y%3D%2244%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2C%20%27Times%20New%20Roman%27%2C%20serif%22%20font-size%3D%2232%22%20font-weight%3D%22700%22%20fill%3D%22%23f6efe6%22%3EG%3C/text%3E%0A%20%20%3Ccircle%20cx%3D%2247%22%20cy%3D%2217%22%20r%3D%224%22%20fill%3D%22%233b82f6%22/%3E%0A%3C/svg%3E">
 <style>
 :root{
   color-scheme: light;
@@ -47,8 +49,6 @@ h1{font-size:20px;font-weight:600;margin:0}
 .btn.primary{background:var(--s1);border-color:var(--s1);color:#fff}
 .btn.primary:hover{background:var(--s1-hover);border-color:var(--s1-hover)}
 
-/* filters: one row above everything it scopes */
-.filters{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end;margin:16px 0 8px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:12px}
 .f{display:flex;flex-direction:column;gap:4px;min-width:0}
 .f > .lab{font-size:12px;color:var(--ink2)}
 select,input[type=search]{height:32px;border:1px solid var(--axis);border-radius:6px;background:var(--surface);padding:0 8px}
@@ -58,7 +58,7 @@ select{min-width:150px}
 .chip{height:32px;padding:0 12px;border-radius:16px;border:1px solid var(--axis);background:transparent;color:var(--ink2)}
 .chip[aria-pressed="true"]{background:var(--s1);border-color:var(--s1);color:#fff}
 input[type=range]{width:150px;accent-color:var(--s1);margin:0;height:32px}
-.active{display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-height:28px;margin:0 0 12px;font-size:13px;color:var(--ink2)}
+.active{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px}
 .tag{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 6px 0 10px;border-radius:13px;background:var(--empty);border:1px solid var(--border);color:var(--ink)}
 .tag button{border:0;background:transparent;width:18px;height:18px;line-height:16px;border-radius:9px;padding:0;color:var(--ink2)}
 .tag button:hover{background:var(--axis)}
@@ -165,16 +165,6 @@ dialog#help::backdrop{background:rgba(0,0,0,.55)}
 
 footer{margin-top:20px;font-size:12px;color:var(--ink2);display:flex;flex-wrap:wrap;gap:4px 16px}
 
-@media (max-width: 1000px){
-  .kpis{grid-template-columns:1fr 1fr}
-  .tile.hero{grid-column:span 2}
-  .c7,.c5,.stack{grid-column:span 12}
-}
-@media (max-width: 560px){
-  .kpis{grid-template-columns:1fr}.tile.hero{grid-column:auto}
-  .tile.hero .v{font-size:48px}
-  .hrow{grid-template-columns:96px 1fr}
-}
 @media print{ .filters,.tvbtn,.tools,.pager,#themeBtn{display:none} body{background:#fff} }
 .sobre{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin:0 0 16px}
 .sobre summary{cursor:pointer;font-weight:600;color:var(--ink)}
@@ -182,25 +172,162 @@ footer{margin-top:20px;font-size:12px;color:var(--ink2);display:flex;flex-wrap:w
 .sobre-corpo h3{font-size:15px;color:var(--ink);margin:14px 0 6px}
 .sobre-corpo ol,.sobre-corpo ul{padding-left:20px;margin:6px 0}
 .sobre-corpo a{color:var(--ink)}
-.sobre-nota{color:var(--muted);font-size:12px}
+.sobre-nota{color:var(--ink2);font-size:12px}
+
+/* ===== Layout v2: so computador (tela >= 1280 px) ===== */
+html,body{min-width:1280px}
+body{display:grid;grid-template-columns:276px minmax(0,1fr);align-items:start;min-height:100vh}
+.skip{position:absolute;left:-999px;top:0}
+.skip:focus{left:8px;top:8px;z-index:100;background:var(--surface);color:var(--ink);padding:8px 12px;border-radius:6px;border:1px solid var(--axis)}
+
+/* barra lateral: marca + filtros, sempre visível, sem rolar com a página */
+.side{position:sticky;top:0;height:100vh;overflow-y:auto;background:#0b0b0b;color:#f6efe6;border-right:1px solid rgba(255,255,255,.10);padding:22px 18px 18px;display:flex;flex-direction:column;gap:22px}
+.brand{color:#f6efe6}
+.brand svg{display:block;height:42px;width:auto}
+.filters{display:flex;flex-direction:column;gap:14px;flex:1}
+.fh{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#c9c4ba;margin:0}
+.side .f > .lab{color:#c9c4ba}
+.side .f > .lab b{color:#f6efe6}
+.side .seg{flex-wrap:wrap}
+.side .chip{border-color:#55534e;color:#e6dfd3}
+.side .chip:hover{background:#242422}
+.side .chip[aria-pressed="true"]{background:#f6efe6;border-color:#f6efe6;color:#0b0b0b;font-weight:600}
+.side select,.side input[type=search]{width:100%;background:#1c1c1b;border-color:#55534e;color:#f6efe6}
+.side input::placeholder{color:#8f8a80}
+.side input[type=range]{width:100%;accent-color:#f6efe6}
+.side .btn{background:transparent;border-color:#55534e;color:#f6efe6}
+.side .btn:hover{background:#242422}
+.side :focus-visible{outline-color:#f6efe6}
+.side .tag{background:#242422;border-color:#55534e;color:#f6efe6}
+.side .tag button{color:#c9c4ba}
+.side .tag button:hover{background:#3a3a37}
+.side .active{color:#c9c4ba}
+.side-foot{display:flex;flex-direction:column;gap:8px}
+.side-foot .btn{text-align:left;padding:0 12px}
+.sobre{margin:16px 0 0}
+.stack{align-content:stretch;grid-template-rows:auto 1fr}
+.stack #card-band{display:flex;flex-direction:column}
+.stack #card-band .cbody{flex:1;display:flex;flex-direction:column}
+.stack #card-band .cols{flex:1;height:auto;min-height:196px}
+#clearBtn{align-self:flex-start}
+
+/* conteúdo */
+.wrap{max-width:none;margin:0;padding:26px 32px 48px;min-width:0}
+main{max-width:1500px}
+.titlerow{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:16px}
+h1{font-size:24px;letter-spacing:-.01em}
+.titlerow .sub{margin:4px 0 0;font-size:14px}
+.scope{display:flex;align-items:center;gap:12px;white-space:nowrap}
+.count{font-size:13px;font-weight:600}
+.pill{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:12px;border:1px solid var(--border);background:var(--empty);color:var(--ink2);font-size:12px}
+
+/* faixa única de indicadores */
+.kpis{display:grid;grid-template-columns:1.35fr repeat(4,1fr);gap:0;margin-bottom:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px}
+.kpis .tile{background:transparent;border:0;border-radius:0;border-left:1px solid var(--grid);padding:16px 20px}
+.kpis .tile:first-child{border-left:0}
+.tile .v{font-size:30px}
+.tile.hero .v{font-size:52px}
+.grid{gap:16px}
+.card{padding:18px 20px}
+
+/* matriz componente x área: barra de total + células de calor, todos os números visíveis */
+.mx{display:grid;grid-template-columns:minmax(120px,170px) minmax(140px,1fr) repeat(var(--na),66px);gap:4px 8px;align-items:center}
+.mx .mh{font-size:12px;font-weight:600;color:var(--ink2);text-align:center;display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 0;border:0;background:transparent;border-radius:6px}
+.mx .mh.l{align-items:flex-start;padding-left:6px}
+.mx button.mh{cursor:pointer}
+.mx button.mh:hover{background:rgba(127,127,127,.12)}
+.mx button.mh strong{color:var(--ink);font-size:13px}
+.mx .mh.sel{background:var(--empty);box-shadow:inset 0 -2px 0 var(--ink)}
+.mx .rname{font-size:13px;color:var(--ink2);text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;background:none;border:0;border-radius:6px;padding:6px}
+.mx .rname:hover{background:rgba(127,127,127,.12)}
+.mx .rname.sel{color:var(--ink);font-weight:600}
+.mx .rbar{position:relative;height:28px;border-left:1px solid var(--axis)}
+.mx .rbar i{position:absolute;left:0;top:6px;height:16px;border-radius:0 4px 4px 0;background:var(--s1)}
+.mx .rbar b{position:absolute;top:0;line-height:28px;font-size:12px;font-weight:600}
+.mx .cell{height:28px;font-variant-numeric:tabular-nums}
+.mx .dim{opacity:.38}
+.mx .rbar.dim i{background:var(--deemph)}
+
+/* v2.1: faixas de severidade com contraste >= 3:1 contra o fundo, nos dois temas */
+:root{--ord1:#4f93e3;--ord2:#2a78d6;--ord3:#1c5cab;--ord4:#123f78}
+@media (prefers-color-scheme: dark){ :root:where(:not([data-theme="light"])){--ord1:#2f6fb8;--ord2:#4a8ee0;--ord3:#79adf0;--ord4:#b4d3f8} }
+:root[data-theme="dark"]{--ord1:#2f6fb8;--ord2:#4a8ee0;--ord3:#79adf0;--ord4:#b4d3f8}
+.pill.warn{border-color:var(--ink2);color:var(--ink);font-weight:600}
+
+@media print{ .side{display:none} body{display:block;min-width:0} }
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Ir para o conteúdo</a>
+<aside class="side" aria-label="Marca e filtros">
+  <div class="brand" role="img" aria-label="Gutenberg Systems"><svg class="logo-full" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 64" width="260" height="64">
+  <rect width="64" height="64" rx="14" fill="#d9482b"/>
+  <rect x="11" y="11" width="42" height="42" rx="8" fill="#0b0b0b"/>
+  <text x="32" y="44" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="32" font-weight="700" fill="#f6efe6">G</text>
+  <circle cx="47" cy="17" r="4" fill="#3b82f6"/>
+  <text x="76" y="37" font-family="Georgia, 'Times New Roman', serif" font-size="30" font-weight="700" fill="currentColor">Gutenberg</text>
+  <text x="78" y="56" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="4" fill="#d9482b">SYSTEMS</text>
+</svg></div>
+  <section class="filters" aria-label="Filtros do dashboard">
+    <h2 class="fh">Filtros</h2>
+    <div class="f"><span class="lab">Área</span><div class="seg" id="fArea"></div></div>
+    <div class="f"><label class="lab" for="fComp">Componente</label><select id="fComp"></select></div>
+    <div class="f"><label class="lab" for="fSit">Situação</label>
+      <select id="fSit">
+        <option value="">Todas</option>
+        <option value="Pendente">Pendente (falta consumir)</option>
+        <option value="Zerada">Zerada</option>
+        <option value="Excedente">Excedente (consumo a mais)</option>
+      </select></div>
+    <div class="f"><label class="lab" for="fMin">Pendência mínima: <b id="fMinV">0</b> un</label><input type="range" id="fMin" min="0" max="150" step="5" value="0"></div>
+    <div class="f"><label class="lab" for="fQ">Buscar ordem</label><input type="search" id="fQ" placeholder="ex.: OP-0075"></div>
+    <button class="btn" id="clearBtn">Limpar filtros</button>
+    <div class="active" id="active" aria-live="polite"></div>
+  </section>
+  <nav class="side-foot" aria-label="Ajuda e preferências">
+    <button class="btn" id="refreshBtn" hidden>Atualizar dados</button>
+    <button class="btn" id="helpBtn" aria-haspopup="dialog">Como usar</button>
+    <button class="btn" id="aboutBtn">Sobre o projeto</button>
+    <button class="btn" id="themeBtn">Tema</button>
+  </nav>
+</aside>
 <div class="wrap" id="app">
-  <div class="top">
+<main id="main">
+  <div class="titlerow">
     <div>
       <h1>Alerta de desvio de consumo</h1>
-      <div class="sub">Gutenberg Systems · pendências de consumo por ordem · dados fictícios</div>
+      <p class="sub">Quais ordens de produção ainda têm componentes a consumir e onde a pendência se concentra.</p>
     </div>
-    <div class="tools">
-      <button class="btn" id="refreshBtn" hidden>Atualizar dados</button>
-      <button class="btn" id="helpBtn" aria-haspopup="dialog">Como usar</button>
-      <button class="btn" id="themeBtn" aria-label="Alternar tema claro e escuro">Tema</button>
-    </div>
+    <div class="scope"><span class="pill" id="srcchip" role="status">Carregando dados…</span><span class="pill">Dados fictícios</span><span class="count" id="count"></span></div>
   </div>
 
-  <details class="sobre" open>
-    <summary>Por que isso existe, como funciona e o que foi medido</summary>
+  <a class="skip" href="#card-table">Pular para a tabela de ordens</a>
+  <div class="kpis" id="kpis" role="group" aria-label="Indicadores"></div>
+
+  <div class="grid">
+    <article class="card c7" id="card-comp">
+      <div class="chead"><div><h2>Componentes por pendência e área</h2><p class="insight"></p></div><button class="tvbtn" aria-pressed="false">Ver tabela</button></div>
+      <div class="cbody"></div>
+    </article>
+    <div class="stack">
+      <article class="card" id="card-area">
+        <div class="chead"><div><h2>Pendência por área</h2><p class="insight"></p></div><button class="tvbtn" aria-pressed="false">Ver tabela</button></div>
+        <div class="cbody"></div>
+      </article>
+      <article class="card" id="card-band">
+        <div class="chead"><div><h2>Ordens por faixa de pendência</h2><p class="insight"></p></div><button class="tvbtn" aria-pressed="false">Ver tabela</button></div>
+        <div class="cbody"></div>
+      </article>
+    </div>
+    <article class="card c12" id="card-table" tabindex="-1">
+      <div class="chead"><div><h2>Ordens para tratar</h2><p class="insight"></p></div>
+        <div class="tools"><button class="btn" id="csvBtn">Baixar CSV do recorte</button></div></div>
+      <div class="cbody"></div>
+    </article>
+  </div>
+
+  <details class="sobre" id="sobre">
+    <summary>Sobre o projeto: por que isso existe, como funciona e o que foi medido</summary>
     <div class="sobre-corpo">
       <h3>Por que isso existe</h3>
       <p>Em operações industriais, cada ordem de produção deveria consumir os componentes previstos. Na prática, nem sempre isso acontece: a produção é apontada, mas o consumo não é baixado no sistema, por falta de saldo em estoque ou por problemas operacionais. Essas pendências afetam a logística, o custo do estoque e a visão real do que está em andamento.</p>
@@ -226,55 +353,12 @@ footer{margin-top:20px;font-size:12px;color:var(--ink2);display:flex;flex-wrap:w
     </div>
   </details>
 
-  <section class="filters" aria-label="Filtros do dashboard">
-    <div class="f"><span class="lab">Área</span><div class="seg" id="fArea"></div></div>
-    <div class="f"><label class="lab" for="fComp">Componente</label><select id="fComp"></select></div>
-    <div class="f"><label class="lab" for="fSit">Situação</label>
-      <select id="fSit">
-        <option value="">Todas</option>
-        <option value="Pendente">Pendente (falta consumir)</option>
-        <option value="Zerada">Zerada</option>
-        <option value="Excedente">Excedente (consumo a mais)</option>
-      </select></div>
-    <div class="f"><label class="lab" for="fMin">Pendência mínima: <b id="fMinV">0</b> un</label><input type="range" id="fMin" min="0" max="150" step="5" value="0"></div>
-    <div class="f"><label class="lab" for="fQ">Buscar ordem</label><input type="search" id="fQ" placeholder="ex.: OP-0075"></div>
-    <button class="btn" id="clearBtn">Limpar filtros</button>
-  </section>
-  <div class="active" id="active" aria-live="polite"></div>
-
-  <section class="kpis" id="kpis" aria-label="Indicadores"></section>
-
-  <section class="grid">
-    <article class="card c7" id="card-top">
-      <div class="chead"><div><h2>Top 10 componentes por pendência</h2><p class="insight"></p></div><button class="tvbtn" aria-pressed="false">Ver tabela</button></div>
-      <div class="cbody"></div>
-    </article>
-    <div class="stack">
-      <article class="card" id="card-area">
-        <div class="chead"><div><h2>Pendência por área</h2><p class="insight"></p></div><button class="tvbtn" aria-pressed="false">Ver tabela</button></div>
-        <div class="cbody"></div>
-      </article>
-      <article class="card" id="card-band">
-        <div class="chead"><div><h2>Ordens por faixa de pendência</h2><p class="insight"></p></div><button class="tvbtn" aria-pressed="false">Ver tabela</button></div>
-        <div class="cbody"></div>
-      </article>
-    </div>
-    <article class="card c12" id="card-heat">
-      <div class="chead"><div><h2>Onde a pendência se concentra: área × componente</h2><p class="insight"></p></div><button class="tvbtn" aria-pressed="false">Ver tabela</button></div>
-      <div class="cbody"></div>
-    </article>
-    <article class="card c12" id="card-table">
-      <div class="chead"><div><h2>Ordens no recorte</h2><p class="insight"></p></div>
-        <div class="tools"><button class="btn" id="csvBtn">Baixar CSV do recorte</button></div></div>
-      <div class="cbody"></div>
-    </article>
-  </section>
-
   <footer>
     <span id="source"></span>
     <span>Pendente = qtd_necessaria − qtd_consumida, quando maior que zero.</span>
     <span>Dados fictícios gerados por scripts/gerar_dados.py (seed 42).</span>
   </footer>
+</main>
 </div>
 <dialog id="help" aria-labelledby="helpTitle">
   <div class="hbox">
@@ -295,7 +379,7 @@ footer{margin-top:20px;font-size:12px;color:var(--ink2);display:flex;flex-wrap:w
         <li><b>Ordens com pendência:</b> quantas ordens ainda têm algo a consumir, e a parcela do recorte.</li>
         <li><b>Soma pendente:</b> total de unidades a consumir, com a média por ordem pendente.</li>
         <li><b>Maior pendência:</b> a ordem com mais unidades em falta.</li>
-        <li><b>Consumo vs. necessário:</b> quanto do previsto já foi consumido, em porcentagem.</li>
+        <li><b>Necessário já consumido:</b> quanto do previsto já foi consumido, em porcentagem. Cada ordem conta no máximo o necessário, então o consumo a mais de uma ordem não esconde a pendência de outra. Fórmula: soma de mín(consumida, necessária) ÷ soma de necessária.</li>
         <li><b>Consumo acima do necessário:</b> quantas ordens passaram do previsto e quantas unidades a mais.</li>
       </ul>
 
@@ -662,15 +746,15 @@ const emptyEl = msg => h('div',{class:'empty'}, msg||'Nenhuma ordem no recorte a
 function renderKPIs(rows){
   const pend=rows.filter(d=>d.pend>0), exc=rows.filter(d=>d.pend<0);
   const soma=pend.reduce((a,d)=>a+d.pend,0);
-  const nec=rows.reduce((a,d)=>a+d.nec,0), con=rows.reduce((a,d)=>a+d.con,0);
+  const nec=rows.reduce((a,d)=>a+d.nec,0), cov=rows.reduce((a,d)=>a+Math.min(d.con,d.nec),0);
   const max=pend.reduce((m,d)=>d.pend>(m?m.pend:0)?d:m,null);
   const tile=(cls,l,v,d,extra)=>h('div',{class:'tile '+cls},h('div',{class:'l'},l),h('div',{class:'v'},v),d?h('div',{class:'d',title:d},d):null,extra);
   $('#kpis').replaceChildren(
     tile('hero','Ordens com pendência',fmt(pend.length),`de ${fmt(rows.length)} ordens no recorte (${pct(pend.length,rows.length)})`),
     tile('','Soma pendente (un)',fmt(soma),pend.length?`média de ${fmt(soma/pend.length)} un por ordem`:'sem pendência no recorte'),
     tile('','Maior pendência (un)',max?fmt(max.pend):'—',max?`${max.ordem} · ${max.comp}`:'sem pendência no recorte'),
-    tile('','Consumo vs. necessário',nec?pct(con,nec):'—',`${fmt(con)} de ${fmt(nec)} un consumidas`,
-      h('div',{class:'meter',role:'img','aria-label':`Consumo em ${nec?pct(con,nec):'—'} do necessário`},h('i',{style:`width:${nec?Math.min(100,con/nec*100):0}%`}))),
+    tile('','Necessário já consumido',nec?pct(cov,nec):'—',`${fmt(cov)} de ${fmt(nec)} un (excedentes não contam)`,
+      h('div',{class:'meter',role:'img','aria-label':`${nec?pct(cov,nec):'—'} do necessário já consumido`},h('i',{style:`width:${nec?Math.min(100,cov/nec*100):0}%`}))),
     tile('','Consumo acima do necessário',fmt(exc.length),`${fmt(exc.reduce((a,d)=>a-d.pend,0))} un a mais que o previsto`)
   );
 }
@@ -686,20 +770,6 @@ function hbars(items, selSet, onPick, tipOf){
       h('div',{class:'htrack'},h('div',{class:'hbar',style:`width:${w}%`}),h('div',{class:'hval',style:`left:calc(${w}% + 6px)`},fmt(i.v))));
     bindTip(row,tipOf(i)); return row;
   }));
-}
-
-function renderTop(){
-  const rows=rowsFor(['comp']), m=sumBy(rows,'comp'), total=[...m.values()].reduce((a,b)=>a+b,0);
-  let list=[...m.entries()].sort((a,b)=>b[1]-a[1]);
-  let top=list.slice(0,10);
-  if (state.comp && m.has(state.comp) && !top.some(t=>t[0]===state.comp)) top[9]=[state.comp,m.get(state.comp)];
-  if (!top.length){ mountCard('top','Sem pendência no recorte.',emptyEl('Sem pendência no recorte.'),emptyEl('Sem pendência no recorte.')); return; }
-  const items=top.map(([k,v])=>({key:k,label:k,v}));
-  const chart=hbars(items,new Set(state.comp?[state.comp]:[]),k=>{ state.comp = state.comp===k?'':k; state.page=0; update(); },
-    i=>({title:i.label,rows:[{k:'Pendência',v:fmt(i.v)+' un'},{k:'Parcela do total',v:pct(i.v,total)}]}));
-  const lead=items[0];
-  mountCard('top',`${lead.label} lidera com ${fmt(lead.v)} un (${pct(lead.v,total)} da pendência). Clique numa barra para filtrar.`,chart,
-    tableView(['Componente','Pendência (un)','% do total'],items.map(i=>[i.label,fmt(i.v),pct(i.v,total)])));
 }
 
 function renderArea(){
@@ -741,48 +811,63 @@ const RAMP=['#cde2fb','#b7d3f6','#9ec5f4','#86b6ef','#6da7ec','#5598e7','#3987e5
 const hex2=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));
 function heatColor(t){
   const r=isDark()?[...RAMP].reverse():RAMP, p=Math.max(0,Math.min(1,t))*(r.length-1), i=Math.floor(p), f=p-i;
-  const a=hex2(r[i]), b=hex2(r[Math.min(i+1,r.length-1)]), c=a.map((v,k)=>Math.round(v+(b[k]-v)*f));
-  const lum=(0.2126*c[0]+0.7152*c[1]+0.0722*c[2])/255;
-  return {bg:`rgb(${c.join(',')})`, fg: lum>0.55?'#0b0b0b':'#ffffff'};
+  const a=hex2(r[i]), b=hex2(r[Math.min(i+1,r.length-1)]); let c=a.map((v,k)=>Math.round(v+(b[k]-v)*f));
+  const lin=v=>{ v/=255; return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4); };
+  const L=0.2126*lin(c[0])+0.7152*lin(c[1])+0.0722*lin(c[2]);
+  const pick=cc=>{ const l=0.2126*lin(cc[0])+0.7152*lin(cc[1])+0.0722*lin(cc[2]), kb=(l+0.05)/0.0533, kw=1.05/(l+0.05); return kb>=kw?['#0b0b0b',kb]:['#ffffff',kw]; };
+  let [fg,k]=pick(c);
+  for (let i=0;i<14&&k<4.6;i++){ c=c.map(v=>Math.round(fg==='#0b0b0b'?v+(255-v)*.05:v*.95)); [fg,k]=pick(c); }
+  return {bg:`rgb(${c.join(',')})`, fg};
 }
-function renderHeat(){
+function renderComp(){
   const rows=rowsFor(['comp','area']).filter(d=>d.pend>0);
-  if (!rows.length){ mountCard('heat','Sem pendência no recorte.',emptyEl('Sem pendência no recorte.'),emptyEl('Sem pendência no recorte.')); return; }
-  const comps=[...COMPS].map(c=>({c,t:rows.filter(d=>d.comp===c).reduce((a,d)=>a+d.pend,0)})).sort((a,b)=>b.t-a.t).map(x=>x.c);
+  if (!rows.length){ mountCard('comp','Sem pendência no recorte.',emptyEl('Sem pendência no recorte.'),emptyEl('Sem pendência no recorte.')); return; }
   const val=(a,c)=>rows.filter(d=>d.area===a&&d.comp===c).reduce((s,d)=>s+d.pend,0);
-  const cells=[]; let max=0;
-  for (const a of AREAS) for (const c of comps){ const v=val(a,c); cells.push({a,c,v}); if (v>max) max=v; }
-  const topKeys=new Set([...cells].sort((x,y)=>y.v-x.v).slice(0,3).filter(x=>x.v>0).map(x=>x.a+'|'+x.c));
-  const grid=h('div',{class:'heat',style:`grid-template-columns:72px repeat(${comps.length},minmax(60px,1fr)) 64px`});
-  grid.append(h('div'), ...comps.map(c=>h('div',{class:'hh',title:c},c)), h('div',{class:'hh'},'Total'));
-  for (const a of AREAS){
-    grid.append(h('div',{class:'hr'},a));
-    for (const c of comps){
-      const v=val(a,c), col=heatColor(max?v/max:0);
-      const isSel=(state.areas.has(a)&&state.comp===c);
-      const cell=h('button',{class:'cell'+(isSel?' sel':''),style:v>0?`background:${col.bg};color:${col.fg}`:'background:var(--empty)',
+  const areasOn=state.areas.size?AREAS.filter(a=>state.areas.has(a)):AREAS;
+  const tot=c=>areasOn.reduce((s,a)=>s+val(a,c),0);
+  const comps=[...COMPS].map(c=>({c,t:tot(c)})).sort((x,y)=>y.t-x.t||x.c.localeCompare(y.c,'pt-BR'));
+  const grand=comps.reduce((s,x)=>s+x.t,0), maxT=Math.max(...comps.map(x=>x.t),1);
+  const all=rows.reduce((s,d)=>s+d.pend,0), areaTot=a=>rows.filter(d=>d.area===a).reduce((s,d)=>s+d.pend,0);
+  let maxC=0; for (const a of AREAS) for (const x of comps) maxC=Math.max(maxC,val(a,x.c));
+  const pickComp=c=>{ state.comp=state.comp===c?'':c; state.page=0; update(); };
+  const pickArea=a=>{ state.areas.has(a)?state.areas.delete(a):state.areas.add(a); state.page=0; update(); };
+  const grid=h('div',{class:'mx',style:`--na:${AREAS.length}`});
+  grid.append(h('div',{class:'mh l'},'Componente'), h('div',{class:'mh l'},'Total (un)'),
+    ...AREAS.map(a=>{ const on=state.areas.has(a);
+      return h('button',{class:'mh'+(on?' sel':'')+(state.areas.size&&!on?' dim':''),'aria-pressed':String(on),
+        'aria-label':`${a}: ${fmt(areaTot(a))} unidades pendentes. Ativar para filtrar.`,onclick:()=>pickArea(a)},
+        h('span',{},a),h('strong',{},fmt(areaTot(a)))); }));
+  for (const {c,t} of comps){
+    const isSel=state.comp===c, dimRow=!!state.comp&&!isSel;
+    grid.append(h('button',{class:'rname'+(isSel?' sel':'')+(dimRow?' dim':''),'aria-pressed':String(isSel),title:c,
+      'aria-label':`${c}: ${fmt(t)} unidades pendentes. Ativar para filtrar.`,onclick:()=>pickComp(c)},c));
+    const bar=h('div',{class:'rbar'+(dimRow?' dim':'')},h('i',{style:`width:${t/maxT*80}%`}),h('b',{style:`left:calc(${t/maxT*80}% + 6px)`},fmt(t)));
+    bindTip(bar,{title:c,rows:[{k:'Pendência',v:fmt(t)+' un'},{k:'Parcela do total',v:pct(t,grand)}]});
+    grid.append(bar);
+    for (const a of AREAS){
+      const v=val(a,c), col=heatColor(maxC?v/maxC:0), cellSel=(state.areas.has(a)&&state.comp===c);
+      const off=(state.areas.size&&!state.areas.has(a))||dimRow;
+      const cell=h('button',{class:'cell'+(cellSel?' sel':'')+(off?' dim':''),
+        style:v>0?`background:${col.bg};color:${col.fg}`:'background:var(--empty);color:var(--ink2)',
         'aria-label':`${a}, ${c}: ${fmt(v)} unidades pendentes. Ativar para filtrar.`,
-        onclick:()=>{ if (isSel){ state.areas.delete(a); state.comp=''; } else { state.areas=new Set([a]); state.comp=c; } state.page=0; update(); }},
-        topKeys.has(a+'|'+c)?fmt(v):'');
-      bindTip(cell,{title:`${a} · ${c}`,rows:[{k:'Pendência',v:fmt(v)+' un'},{k:'Parcela do total',v:pct(v,rows.reduce((s,d)=>s+d.pend,0))}]});
+        onclick:()=>{ if (cellSel){ state.areas.delete(a); state.comp=''; } else { state.areas=new Set([a]); state.comp=c; } state.page=0; update(); }},
+        v>0?fmt(v):'–');
+      bindTip(cell,{title:`${a} · ${c}`,rows:[{k:'Pendência',v:fmt(v)+' un'},{k:'Parcela do total',v:pct(v,all)}]});
       grid.append(cell);
     }
-    grid.append(h('div',{class:'tot'},fmt(AREAS.length?rows.filter(d=>d.area===a).reduce((s,d)=>s+d.pend,0):0)));
   }
-  grid.append(h('div',{class:'hr'},'Total'), ...comps.map(c=>h('div',{class:'tot'},fmt(rows.filter(d=>d.comp===c).reduce((s,d)=>s+d.pend,0)))), h('div',{class:'tot'},fmt(rows.reduce((s,d)=>s+d.pend,0))));
   const ramp=[0,.25,.5,.75,1].map(t=>heatColor(t).bg).join(',');
-  const chart=h('div',{},h('div',{class:'heatwrap'},grid),
-    h('div',{class:'scale'},'0',h('i',{style:`background:linear-gradient(90deg,${ramp})`}),fmt(max)+' un'));
-  const best=[...cells].sort((x,y)=>y.v-x.v)[0];
-  mountCard('heat',`Maior concentração: ${best.c} em ${best.a} (${fmt(best.v)} un). Clique numa célula para filtrar.`,chart,
-    tableView(['Área','Componente','Pendência (un)'],cells.filter(x=>x.v>0).sort((x,y)=>y.v-x.v).map(x=>[x.a,x.c,fmt(x.v)])));
+  const chart=h('div',{},grid,h('div',{class:'scale'},'Cor das células: 0',h('i',{style:`background:linear-gradient(90deg,${ramp})`}),fmt(maxC)+' un'));
+  const lead=comps[0];
+  mountCard('comp',`${lead.c} lidera com ${fmt(lead.t)} un (${pct(lead.t,grand)} da pendência). Clique numa linha, coluna ou célula para filtrar.`,chart,
+    tableView(['Componente',...AREAS,'Total (un)'],comps.map(x=>[x.c,...AREAS.map(a=>fmt(val(a,x.c))),fmt(x.t)])));
 }
 
 /* ===== Tabela de ordens ===== */
 const ICON={
-  Pendente:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 15 14H1z" fill="var(--warn)"/><path d="M8 6v4M8 11.5v1" stroke="#0b0b0b" stroke-width="1.5" stroke-linecap="round"/></svg>',
-  Zerada:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="var(--good)"/><path d="m4.8 8.2 2.2 2.2 4.2-4.4" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  Excedente:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="var(--serious)"/><path d="M8 11.5v-7M5 7l3-3 3 3" stroke="#0b0b0b" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  Pendente:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 15 14H1z" fill="var(--warn)" stroke="var(--ink)" stroke-width=".9" stroke-linejoin="round"/><path d="M8 6v4M8 11.5v1" stroke="#0b0b0b" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  Zerada:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="var(--good)" stroke="var(--ink)" stroke-width=".9"/><path d="m4.8 8.2 2.2 2.2 4.2-4.4" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  Excedente:'<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="var(--serious)" stroke="var(--ink)" stroke-width=".9"/><path d="M8 11.5v-7M5 7l3-3 3 3" stroke="#0b0b0b" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 };
 function badge(s){ const b=h('span',{class:'badge'}); b.innerHTML=ICON[s]; b.append(document.createTextNode(s)); return b; }  /* ICON é constante interna, não dado externo */
 const COLS=[['ordem','Ordem',0],['area','Área',0],['comp','Componente',0],['nec','Necessária',1],['con','Consumida',1],['pend','Pendente',1],['sit','Situação',0]];
@@ -794,7 +879,7 @@ function renderTable(){
   const slice=sorted.slice(state.page*PAGE,state.page*PAGE+PAGE);
   $('#card-table .insight').textContent=`${fmt(rows.length)} ordens · ${fmt(rows.filter(d=>d.pend>0).length)} com pendência.`;
   const body=$('#card-table .cbody');
-  if (!rows.length){ body.replaceChildren(emptyEl()); return; }
+  if (!rows.length){ body.replaceChildren(h('div',{class:'empty'},'Nenhuma ordem com esses filtros.',h('br'),h('button',{class:'btn',style:'margin-top:10px',onclick:()=>$('#clearBtn').click()},'Limpar filtros'))); return; }
   const th=COLS.map(([k,l,n])=>h('th',{class:n?'n':'','aria-sort':key===k?(dir>0?'ascending':'descending'):'none'},
     h('button',{onclick:()=>{ state.sort = key===k?{key:k,dir:-dir}:{key:k,dir:(n?-1:1)}; state.page=0; renderTable(); }}, l + (key===k?(dir>0?' ▲':' ▼'):''))));
   const table=h('table',{},h('thead',{},h('tr',{},th)),h('tbody',{},slice.map(d=>h('tr',{},
@@ -836,7 +921,7 @@ function renderActive(){
   if (state.min>0) tag('Pendência ≥ '+state.min+' un',()=>{state.min=0;update();});
   if (state.band!=null) tag('Faixa: '+BANDS[state.band].l+' un',()=>{state.band=null;update();});
   if (state.q) tag('Ordem: '+state.q,()=>{state.q='';update();});
-  $('#active').replaceChildren(...(tags.length?[ 'Filtros ativos:', ...tags ]:[ 'Sem filtros: mostrando todas as ordens. Clique nos gráficos para filtrar.' ]));
+  $('#active').replaceChildren(...(tags.length?[ 'Filtros ativos:', ...tags ]:[ 'Nenhum filtro ativo. Clique nos gráficos para filtrar.' ]));
 }
 function saveHash(){
   const p=new URLSearchParams();
@@ -853,10 +938,22 @@ function loadHash(){
   state.min=Math.max(0,Math.min(150,Number(p.get('m'))||0)); const b=p.get('b'); state.band=(b!=null&&BANDS[Number(b)])?Number(b):null; state.q=(p.get('q')||'').toLowerCase();
 }
 
+/* ===== Layout v2: contagem do recorte, tema e navegação ===== */
+function renderStatus(){
+  $('#count').textContent = `${fmt(rowsFor([]).length)} de ${fmt(DATA.length)} ordens no recorte`;
+  const cur = isDark()?'escuro':'claro', other = isDark()?'claro':'escuro', b=$('#themeBtn');
+  b.textContent = 'Tema: '+cur;
+  b.setAttribute('aria-label', `Tema: ${cur}. Alternar para ${other}.`);
+}
+$('#aboutBtn').addEventListener('click', ()=>{
+  const d=$('#sobre'); d.open=true;
+  d.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'start'});
+});
+
 /* ===== Orquestração ===== */
 function render(){
-  syncControls(); renderActive(); renderKPIs(rowsFor([]));
-  renderTop(); renderArea(); renderBands(); renderHeat(); renderTable();
+  syncControls(); renderActive(); renderStatus(); renderKPIs(rowsFor([]));
+  renderComp(); renderArea(); renderBands(); renderTable();
 }
 function update(){ hideTip(); render(); saveHash(); }
 function setData(csv, label){
@@ -864,6 +961,10 @@ function setData(csv, label){
   AREAS=[...new Set(DATA.map(d=>d.area))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
   COMPS=[...new Set(DATA.map(d=>d.comp))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
   $('#source').textContent=label;
+  const chip=$('#srcchip'), ao=label.includes('ao vivo'), falhou=label.includes('não foi possível');
+  chip.textContent = ao ? label.replace('Fonte: Google Sheets ao vivo, carregado às ','Ao vivo · atualizado às ').replace(/\.$/,'')
+                   : falhou ? '⚠ Snapshot embutido · Google Sheets indisponível' : 'Snapshot embutido';
+  chip.classList.toggle('warn', falhou);
 }
 async function load(){
   const app=$('#app'); app.classList.add('loading');
