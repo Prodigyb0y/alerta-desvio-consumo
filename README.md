@@ -84,7 +84,7 @@ E-mail recebido numa execução real (n8n):
 
 ### Ganho de tempo (processo manual cronometrado pelo autor)
 
-**Premissas:** 2 execuções por dia útil, com 22 dias úteis por mês, 260 por ano e 5 por semana. O processo manual foi cronometrado pelo autor: 5 minutos para um profissional com experiência e 10 minutos para quem não tem essa experiência. O processo manual inclui pegar o arquivo, filtrar as ordens com consumo pendente, filtrar por área, exportar e, às vezes, montar um mini gráfico. Com o e-mail automático, a leitura leva 1 minuto por execução.
+**Premissas:** 2 execuções por dia útil, com 22 dias úteis por mês, 260 por ano e 5 por semana. O processo manual foi cronometrado pelo autor, em 3 a 10 repetições, com a base fictícia do projeto: 5 minutos para um profissional com experiência e 10 minutos para quem não tem essa experiência. O processo manual inclui pegar o arquivo, filtrar as ordens com consumo pendente, filtrar por área, exportar e, às vezes, montar um mini gráfico. Com o e-mail automático, a leitura leva 1 minuto por execução.
 
 **Método:** horas ganhas = (minutos do processo manual − 1 minuto de leitura) × execuções no período ÷ 60.
 
