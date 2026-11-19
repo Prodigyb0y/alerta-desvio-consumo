@@ -45,7 +45,7 @@ Planos conferidos nos painéis de Make, Zapier e n8n. Detalhes em [`planos.md`](
 - Limpeza: removidos os `.gitkeep` de pastas que já têm conteúdo e a nota de rascunho do README.
 - Limpeza da aba `resumo`: as linhas de teste foram apagadas e ficaram a execução do n8n (21:16:08) e a do Make (21:23:49), ambas no formato novo do top 5.
 - Efeito colateral encontrado: depois de apagar linhas, a linha nova do n8n (21:33:58, linha 4) não disparou o Zap em 16 minutos, porque o Zapier já tinha visto linhas até o número 7. Desligar e ligar o Zap resolveu: a linha 5 (n8n, 21:50:24) gerou a execução das 21:52:45 (Successful, 1 tarefa, e-mail `[N8N]`). A linha 4 permanece na aba sem e-mail. Documentado em `zapier/README.md`.
-- Dashboard conferido em janela anônima (https://prodigyb0y.github.io/alerta-desvio-consumo/): carrega sem login, com 149 ordens com pendência, 7.981 un. de soma e maior pendência de 174 un. (OP-0075 · Rolamento 6204). Print em `docs/img/dashboard.png`.
+- Dashboard conferido em janela anônima (https://prodigyb0y.github.io/alerta-desvio-consumo/): carrega sem login, com 149 ordens com pendência, 7.981 un. de soma e maior pendência de 174 un. (OP-0075 · Rolamento 6204). Print em `docs/img/dashboard.png` (substituído na fase 7; hoje `docs/img/dashboard-v2.png`).
 
 ## Fase 7: redesenho do dashboard e verificações (19/11/2026)
 - Novo layout só para computador, matriz componente × área e indicador "Necessário já consumido" (84,9%, no lugar de 86,7%). Motivos em [`decisoes.md`](decisoes.md).
@@ -55,4 +55,4 @@ Planos conferidos nos painéis de Make, Zapier e n8n. Detalhes em [`planos.md`](
 - **Teclado:** todos os controles têm foco visível; a matriz tem muitas paradas de Tab, por isso há o atalho "Pular para a tabela de ordens" (conferido: o foco vai para a tabela).
 - **Árvore de acessibilidade** conferida no Chromium (títulos, nomes dos controles, estado dos filtros). **Não** foi testado com leitor de tela real (NVDA, VoiceOver) nem com pessoas.
 - **Daltonismo:** simulação de deuteranopia e protanopia sobre a captura da página; a paleta de um matiz e os números escritos mantêm a leitura. Sem teste com pessoas.
-- A captura `docs/img/dashboard.png` foi substituída pela da versão final (card "Ordens com excedente" incluído). Foi tirada com o CSV do repositório servido no lugar da planilha, que tem os mesmos totais, e o texto alternativo da imagem no README descreve o conteúdo da tela.
+- A captura do README foi refeita com a versão final (card "Ordens com excedente" incluído) e o arquivo passou a se chamar `docs/img/dashboard-v2.png`; o nome novo evita que o GitHub e os navegadores mostrem a imagem antiga em cache. Ela foi tirada com o CSV do repositório servido no lugar da planilha, que tem os mesmos totais, e o texto alternativo no README descreve o conteúdo da tela.
