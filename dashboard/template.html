@@ -222,7 +222,7 @@ h1{font-size:24px;letter-spacing:-.01em}
 .pill{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:12px;border:1px solid var(--border);background:var(--empty);color:var(--ink2);font-size:12px}
 
 /* faixa única de indicadores */
-.kpis{display:grid;grid-template-columns:1.35fr repeat(4,1fr);gap:0;margin-bottom:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px}
+.kpis{display:grid;grid-template-columns:1.2fr 1fr 1fr 1.15fr 1.15fr;gap:0;margin-bottom:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px}
 .kpis .tile{background:transparent;border:0;border-radius:0;border-left:1px solid var(--grid);padding:16px 20px}
 .kpis .tile:first-child{border-left:0}
 .tile .v{font-size:30px}
@@ -373,7 +373,7 @@ h1{font-size:24px;letter-spacing:-.01em}
         <li><b>Soma pendente:</b> total de unidades a consumir, com a média por ordem pendente.</li>
         <li><b>Maior pendência:</b> a ordem com mais unidades em falta.</li>
         <li><b>Necessário já consumido:</b> quanto do previsto já foi consumido, em porcentagem. Cada ordem conta no máximo o necessário, então o consumo a mais de uma ordem não esconde a pendência de outra. Fórmula: soma de mín(consumida, necessária) ÷ soma de necessária.</li>
-        <li><b>Consumo acima do necessário:</b> quantas ordens passaram do previsto e quantas unidades a mais.</li>
+        <li><b>Ordens com excedente:</b> quantas ordens consumiram mais do que o necessário (situação Excedente), a parcela do recorte e o total de unidades consumidas além do previsto.</li>
       </ul>
 
       <h3>Filtros</h3>
@@ -548,7 +548,8 @@ function renderKPIs(rows){
     tile('','Maior pendência (un)',max?fmt(max.pend):'—',max?`${max.ordem} · ${max.comp}`:'sem pendência no recorte'),
     tile('','Necessário já consumido',nec?pct(cov,nec):'—',`${fmt(cov)} de ${fmt(nec)} un (excedentes não contam)`,
       h('div',{class:'meter',role:'img','aria-label':`${nec?pct(cov,nec):'—'} do necessário já consumido`},h('i',{style:`width:${nec?Math.min(100,cov/nec*100):0}%`}))),
-    tile('','Consumo acima do necessário',fmt(exc.length),`${fmt(exc.reduce((a,d)=>a-d.pend,0))} un a mais que o previsto`)
+    tile('','Ordens com excedente',fmt(exc.length),`${pct(exc.length,rows.length)} das ordens no recorte`,
+      h('div',{class:'d'},`${fmt(exc.reduce((a,d)=>a-d.pend,0))} un a mais que o necessário`))
   );
 }
 

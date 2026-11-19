@@ -44,7 +44,7 @@
 - O Top 10 e o mapa de calor repetiam os totais por componente, e o mapa só mostrava números nas 3 maiores células. A matriz mostra os 12 componentes, o total e o valor de cada área, todos com número.
 - O público do dashboard (operação e logística, no computador) não usa tablet ou celular, então manter essas versões só gerava código e testes a mais.
 
-**Indicador corrigido:** "Consumo vs. necessário" (86,7%) somava todo o consumo contra todo o necessário, e os 944 un consumidos a mais compensavam parte das pendências. Passou a se chamar "Necessário já consumido" e usa Σ mín(consumida, necessária) ÷ Σ necessária: 44.995 de 52.976 un, ou 84,9%. O consumo a mais continua no indicador próprio "Consumo acima do necessário".
+**Indicador corrigido:** "Consumo vs. necessário" (86,7%) somava todo o consumo contra todo o necessário, e os 944 un consumidos a mais compensavam parte das pendências. Passou a se chamar "Necessário já consumido" e usa Σ mín(consumida, necessária) ÷ Σ necessária: 44.995 de 52.976 un, ou 84,9%. O consumo a mais continua no indicador próprio "Ordens com excedente".
 
 **Consequências:**
 - A marca (logo e ícone) fica em `dashboard/assets/` e é embutida no HTML pelo `scripts/build_dashboard.py`, que remove o bloco de metadados C2PA dos SVG ao embutir. O favicon vem do ícone.
