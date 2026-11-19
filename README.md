@@ -8,6 +8,16 @@ Fluxo ponta a ponta que detecta ordens de produção com consumo abaixo do neces
 
 ![Dashboard publicado no GitHub Pages](docs/img/dashboard.png)
 
+## Por que isso existe
+
+Em operações industriais, cada ordem de produção deveria consumir os componentes previstos. Na prática, nem sempre isso acontece: a produção é apontada, mas o consumo não é baixado automaticamente no sistema, por falta de saldo em estoque ou por problemas operacionais. Essas pendências afetam a logística, o custo do estoque e a visão real do que está em andamento na fábrica.
+
+O problema não é só a pendência, é a demora para enxergá-la. Separar as ordens que precisam de ação exige montar um recorte à mão, a partir de um relatório grande, com muita informação além das ordens, e repetir isso para cada área. Quem precisa agir, como programação e planejamento, recebe o sinal tarde, quando a pendência já se acumulou.
+
+Este projeto recria essa rotina com dados fictícios. Ele calcula as pendências sozinho, avisa as equipes com o total e os componentes que mais pesam, e disponibiliza um dashboard para ver tudo em detalhe, para que a atenção vá primeiro para as ordens mais problemáticas. No modelo de produção, o aviso sai no início do dia; na demo, o disparo é manual.
+
+*Recriação conceitual de uma experiência real. Nenhum dado, nome de sistema ou informação da empresa de origem aparece aqui.*
+
 ## Tecnologias
 
 | Camada | Tecnologia | Papel |
