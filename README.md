@@ -51,4 +51,4 @@ Detalhes em [`docs/planos.md`](docs/planos.md).
 - [x] Fase 2: dashboard em HTML publicado no GitHub Pages, lendo a aba `ordens` ao vivo
 - [x] Fase 3: cálculo com n8n (`n8n/workflow.json`)
 - [x] Fase 4: cálculo com Make (`make/blueprint.json`)
-- [ ] Fase 5: notificação com Zapier
+- [x] Fase 5: notificação com Zapier (`zapier/README.md`)

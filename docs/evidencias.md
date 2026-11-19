@@ -27,3 +27,11 @@ Planos conferidos nos painéis de Make, Zapier e n8n. Detalhes em [`planos.md`](
 - Consumo da execução: 5 operações (5 créditos).
 - Correção feita no caminho: o filtro tinha sido salvo com o texto `qtd_pendente_calc` e operador de tempo, e por isso não bloqueava nenhuma linha. Foi refeito com a coluna H e operador numérico.
 - `make/blueprint.json` foi montado a partir da configuração aplicada no cenário e pode diferir em metadados do que o botão "Export Blueprint" gera.
+
+## Fase 5: notificação com Zapier (18/11/2026)
+- Zap de duas etapas (Google Sheets "New Spreadsheet Row" em `resumo` → Gmail "Send Email" para o endereço de teste). Detalhes em [`zapier/README.md`](../zapier/README.md). O Zapier não agrega nada.
+- Execução real: o n8n gravou a linha `18/11/2026 21:04:28 | N8N | 149 | 7981` e o Zap rodou às 21:06:32 (histórico do Zapier: Successful, 1 tarefa), enviando o e-mail `[N8N] Alerta de desvio de consumo: 149 ordens com pendência`.
+- O e-mail foi refeito em HTML (v2) e o rótulo da soma passou a "Unidades pendentes (necessárias − consumidas)". Na v3 o top 5 passou a uma linha por componente (`Componente — N un.`): n8n e Make gravam o texto com quebra de linha e o Zap exibe com `white-space:pre-line`.
+- Conferência da v3: execução do n8n às 21:16:08 gerou o e-mail `[N8N]` com o top 5 em lista (1205, 966, 904, 863, 737 un.), total 149 e 7981 unidades, iguais à referência em Python.
+- Pendente de conferência: o novo formato do top 5 no Make (a quebra de linha na expressão do `join`) ainda não foi executado. `make/blueprint.json` e `n8n/workflow.json` já refletem o formato novo.
+- As linhas antigas de `resumo` (testes anteriores) mantêm o top 5 no formato com ponto e vírgula.
