@@ -41,3 +41,6 @@ Planos conferidos nos painéis de Make, Zapier e n8n. Detalhes em [`planos.md`](
 - Novo `scripts/calculo_referencia.py` (apenas biblioteca padrão), que reproduz os números de referência: 200 linhas, 149 ordens com pendência, soma 7.981, 49 negativas, 2 zeradas e o mesmo top 5.
 - Imagens dos e-mails `[N8N]` e `[MAKE]` em `docs/img/`.
 - Limpeza: removidos os `.gitkeep` de pastas que já têm conteúdo e a nota de rascunho do README.
+- Limpeza da aba `resumo`: as linhas de teste foram apagadas e ficaram a execução do n8n (21:16:08) e a do Make (21:23:49), ambas no formato novo do top 5.
+- Efeito colateral encontrado: depois de apagar linhas, a linha nova do n8n (21:33:58, linha 4) não disparou o Zap em 16 minutos, porque o Zapier já tinha visto linhas até o número 7. Desligar e ligar o Zap resolveu: a linha 5 (n8n, 21:50:24) gerou a execução das 21:52:45 (Successful, 1 tarefa, e-mail `[N8N]`). A linha 4 permanece na aba sem e-mail. Documentado em `zapier/README.md`.
+- Dashboard conferido em janela anônima (https://prodigyb0y.github.io/alerta-desvio-consumo/): carrega sem login, com 149 ordens com pendência, 7.981 un. de soma e maior pendência de 174 un. (OP-0075 · Rolamento 6204). Print em `docs/img/dashboard.png`.

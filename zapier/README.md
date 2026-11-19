@@ -20,5 +20,6 @@ Cabeçalho, "Execução em `data_execucao` · via `ferramenta`", dois cartões (
 ## Observações
 - Plano: desenhado para o gratuito (100 tarefas/mês, Zaps de duas etapas). Cada linha nova em `resumo` consome 1 tarefa. Na construção a conta estava em teste do plano Pro (expira em 02/12/2026).
 - O gatilho detectou a linha gravada por API (n8n) em cerca de 2 minutos. O Zapier pode levar até 15 min.
+- **Se apagar linhas da aba `resumo`, desligue e ligue o Zap.** Ele acompanha as linhas pelo número: depois de apagar linhas, a próxima linha nova (com número já visto) não dispara o e-mail. Ao religar o Zap, o gatilho volta a detectar as linhas novas (testado em 18/11/2026).
 - Zap antigo da conta ("Alerta desvio de consumo - Gutenberg - pendentes para e-mail") não faz parte deste projeto e não foi alterado.
 - Versões publicadas: v1 (texto simples), v2 (HTML), v3 (top 5 em lista).

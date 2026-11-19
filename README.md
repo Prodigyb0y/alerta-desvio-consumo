@@ -84,7 +84,7 @@ O mesmo resultado vindo do Make (assunto `[MAKE]`): [`docs/img/email-make.png`](
 - **Planos gratuitos:** Make com 1.000 créditos/mês e agendamento mínimo de 15 min; Zapier desenhado para 100 tarefas/mês, com Zaps de duas etapas e gatilho "nova linha" que pode levar até 15 min (na construção a conta estava em teste do Pro, até 02/12/2026); n8n Cloud em teste de 14 dias. Por isso o fluxo do n8n está exportado em `n8n/workflow.json`. Detalhes em [`docs/planos.md`](docs/planos.md).
 - **Número sem separador de milhar** no e-mail (7981): formatá-lo exigiria uma etapa extra no Zapier, e o Zap tem só duas.
 - **Dados publicados:** a aba `ordens` fica pública como CSV para o dashboard ler. É seguro porque os dados são fictícios.
-- A aba `resumo` guarda as execuções de teste da construção, algumas com o formato antigo do top 5.
+- A aba `resumo` guarda as execuções de teste. Ao apagar linhas dela, desligue e ligue o Zap, senão a próxima linha nova pode não disparar o e-mail (ver `zapier/README.md`).
 
 ## Status
 
