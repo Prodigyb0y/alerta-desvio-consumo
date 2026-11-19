@@ -82,18 +82,21 @@ E-mail recebido numa execução real (n8n):
 | Duração de cada execução do Make | 0,4 s a 1,1 s | Duração registrada no histórico do Make |
 | Tempo do processo manual | Não medido. Há apenas uma estimativa do autor, de 3 a 10 minutos por pessoa | Não se aplica |
 
-### Ganho estimado de tempo (estimativa, não medida)
+### Ganho de tempo (processo manual cronometrado pelo autor)
 
-| Período | Dias úteis | Execuções | Com 5 min por execução | Com 10 min por execução |
-|---|---|---|---|---|
-| Semana | 5 | 10 | 50 min (0,83 h) | 100 min (1,67 h) |
-| Mês | 22 | 44 | 220 min (3,67 h) | 440 min (7,33 h) |
-| Ano | 260 | 520 | 2.600 min (43,3 h) | 5.200 min (86,7 h) |
+**Premissas:** 2 execuções por dia útil, com 22 dias úteis por mês, 260 por ano e 5 por semana. O processo manual foi cronometrado pelo autor: 5 minutos para um profissional com experiência e 10 minutos para quem não tem essa experiência. O processo manual inclui pegar o arquivo, filtrar as ordens com consumo pendente, filtrar por área, exportar e, às vezes, montar um mini gráfico. Com o e-mail automático, a leitura leva 1 minuto por execução.
 
-**Método:** horas ganhas = minutos do processo manual por execução × execuções no período ÷ 60.
-**Premissas:** 2 execuções por dia útil; 1 pessoa. O processo manual inclui abrir o arquivo de ordens, filtrar as ordens com consumo negativo, filtrar por área, exportar e, às vezes, montar um gráfico. Os 5 minutos são a estimativa para quem tem prática; 10 minutos, para quem não tem. O tempo de leitura do e-mail não foi descontado, porque não foi medido.
-**Fora do cálculo:** o ganho de visualização do dashboard. Ele facilita a leitura, mas não tem um tempo associado.
-**Como transformar em medição:** cronometrar o processo manual três vezes com a base fictícia, registrar em `docs/resultados.md` e substituir os valores da tabela.
+**Método:** horas ganhas = (minutos do processo manual − 1 minuto de leitura) × execuções no período ÷ 60.
+
+| Período | Execuções | Profissional com experiência (4 min ganhos por execução) | Sem experiência (9 min ganhos por execução) |
+|---|---|---|---|
+| Semana | 10 | 40 min (0,7 h) | 90 min (1,5 h) |
+| Mês | 44 | 176 min (2,9 h) | 396 min (6,6 h) |
+| Ano | 520 | 2.080 min (34,7 h) | 4.680 min (78 h) |
+
+Além das horas, o dashboard facilita a visualização das ordens e dos componentes com pendência. Esse ganho é qualitativo e não foi medido em tempo.
+
+Detalhes da cronometragem e pendências em [`docs/resultados.md`](docs/resultados.md).
 
 **Por que isso importa para um time de negócio:** em vez de montar o recorte à mão, quem acompanha os desvios recebe, a cada execução, o total de ordens com consumo abaixo do necessário, o volume pendente e os componentes que mais pesam, com link para o dashboard.
 
