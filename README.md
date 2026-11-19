@@ -71,6 +71,28 @@ E-mail recebido numa execução real (n8n):
 
 ![E-mail gerado pelo Zapier a partir da linha do n8n](docs/img/email-n8n.png)
 
+## Os fluxos e os e-mails
+
+Prints das ferramentas como ficaram ao final. Os arquivos exportados estão em [`n8n/workflow.json`](n8n/workflow.json) e [`make/blueprint.json`](make/blueprint.json).
+
+**n8n:** seis nós, execução com sucesso (200 linhas lidas, 149 mantidas pelo filtro, 1 linha gravada em `resumo`).
+
+![Fluxo do n8n: gatilho manual, leitura da aba ordens, filtro, agregação, código em JavaScript e gravação em resumo](docs/img/fluxo-n8n.png)
+
+**Make:** o mesmo cálculo, com o filtro `pendente > 0` na leitura, dois agregadores e um iterador. Cenário sob demanda e inativo, para não rodar junto com o n8n.
+
+![Cenário do Make: Search Rows, Array aggregator, Iterator, Array aggregator e Add a Row](docs/img/fluxo-make.png)
+
+**Zapier:** duas etapas, sempre ligado. Só repassa a linha nova de `resumo` para o Gmail.
+
+![Zap do Zapier: New Spreadsheet Row no Google Sheets e Send Email no Gmail](docs/img/fluxo-zapier.png)
+
+**E-mails recebidos:** o mesmo layout, com o prefixo da ferramenta que fez o cálculo.
+
+![E-mail [N8N] com os números e o top 5 em lista](docs/img/email-n8n.png)
+
+![E-mail [MAKE] com os mesmos números e o top 5 em lista](docs/img/email-make.png)
+
 ## Resultados medidos
 
 | Medida | Resultado | Como foi medida |
