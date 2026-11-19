@@ -35,3 +35,9 @@ Planos conferidos nos painéis de Make, Zapier e n8n. Detalhes em [`planos.md`](
 - Conferência da v3: execução do n8n às 21:16:08 gerou o e-mail `[N8N]` com o top 5 em lista (1205, 966, 904, 863, 737 un.), total 149 e 7981 unidades, iguais à referência em Python.
 - Make no formato novo: a primeira execução (21:20:16) gravou `\n` como texto, porque o `join` usava `"\n"` entre aspas. Corrigido conforme a documentação/comunidade do Make para a constante `newline` (`join(...; newline)`). Nova execução (21:23:49) gerou o e-mail `[MAKE]` com o top 5 em lista, idêntico ao do `[N8N]` (149 ordens, 7981 unidades). `make/blueprint.json` e `n8n/workflow.json` refletem o formato novo.
 - As linhas antigas de `resumo` (testes anteriores) mantêm o top 5 no formato com ponto e vírgula.
+
+## Fase 6: README final e organização (18/11/2026)
+- README reescrito: visão geral, diagrama do fluxo, resultado de referência, estrutura, como reproduzir, decisões e limitações.
+- Novo `scripts/calculo_referencia.py` (apenas biblioteca padrão), que reproduz os números de referência: 200 linhas, 149 ordens com pendência, soma 7.981, 49 negativas, 2 zeradas e o mesmo top 5.
+- Imagens dos e-mails `[N8N]` e `[MAKE]` em `docs/img/`.
+- Limpeza: removidos os `.gitkeep` de pastas que já têm conteúdo e a nota de rascunho do README.

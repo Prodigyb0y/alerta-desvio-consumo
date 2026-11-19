@@ -26,3 +26,9 @@
 - Em produção, o gatilho natural seria um agendamento diário (por exemplo, 07:00 em America/Sao_Paulo). Basta trocar o gatilho manual por um Schedule Trigger no n8n ou um agendamento no Make (mínimo de 15 minutos no plano gratuito).
 - Apenas uma das duas ferramentas (n8n ou Make) deve estar ativa por vez, porque o Zapier notifica toda linha nova em `resumo`.
 - O Zap do Zapier continua ligado e envia um e-mail por linha nova.
+
+## Prefixo do assunto: [N8N] e [MAKE], sem [ZAPIER] (18/11/2026)
+
+**Decisão:** o assunto do e-mail leva o prefixo da ferramenta que escreveu a linha em `resumo` (coluna `ferramenta`): `[N8N]` ou `[MAKE]`. O prefixo `[ZAPIER]` não é usado.
+
+**Motivo:** o Zapier só notifica, em duas etapas, e não calcula nada. Marcar o e-mail como `[ZAPIER]` esconderia qual ferramenta fez o cálculo, que é a informação útil para quem lê.
