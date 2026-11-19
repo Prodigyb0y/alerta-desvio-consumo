@@ -82,6 +82,18 @@ E-mail recebido numa execução real (n8n):
 | Duração de cada execução do Make | 0,4 s a 1,1 s | Duração registrada no histórico do Make |
 | Tempo do processo manual | Não medido. Há apenas uma estimativa do autor, de 3 a 10 minutos por pessoa | Não se aplica |
 
+### Ganho estimado de tempo (estimativa, não medida)
+
+| Período | Dias úteis | Com 3 min por dia | Com 10 min por dia |
+|---|---|---|---|
+| Semana | 5 | 15 min (0,25 h) | 50 min (0,83 h) |
+| Mês | 22 | 66 min (1,1 h) | 220 min (3,7 h) |
+| Ano | 260 | 780 min (13 h) | 2.600 min (43,3 h) |
+
+**Método:** horas ganhas = minutos do processo manual por execução × execuções no período ÷ 60.
+**Premissas:** 1 execução por dia útil, 1 pessoa fazendo o processo, 22 dias úteis por mês e 260 por ano. Os 3 e 10 minutos vêm da estimativa do autor, não de cronometragem. O tempo de leitura do e-mail não foi descontado, porque não foi medido.
+**Como transformar em medição:** cronometrar o processo manual três vezes, registrar em `docs/resultados.md` e substituir os valores da tabela. Na demo o disparo é manual, então o ganho acima vale para o modelo de produção, em que o fluxo roda todo dia.
+
 **Por que isso importa para um time de negócio:** em vez de montar o recorte à mão, quem acompanha os desvios recebe, a cada execução, o total de ordens com consumo abaixo do necessário, o volume pendente e os componentes que mais pesam, com link para o dashboard.
 
 ## Estrutura do repositório
