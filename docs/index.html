@@ -176,6 +176,13 @@ footer{margin-top:20px;font-size:12px;color:var(--ink2);display:flex;flex-wrap:w
   .hrow{grid-template-columns:96px 1fr}
 }
 @media print{ .filters,.tvbtn,.tools,.pager,#themeBtn{display:none} body{background:#fff} }
+.sobre{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin:0 0 16px}
+.sobre summary{cursor:pointer;font-weight:600;color:var(--ink)}
+.sobre-corpo{color:var(--ink2);font-size:14px;line-height:1.55;margin-top:12px}
+.sobre-corpo h3{font-size:15px;color:var(--ink);margin:14px 0 6px}
+.sobre-corpo ol,.sobre-corpo ul{padding-left:20px;margin:6px 0}
+.sobre-corpo a{color:var(--ink)}
+.sobre-nota{color:var(--muted);font-size:12px}
 </style>
 </head>
 <body>
@@ -191,6 +198,33 @@ footer{margin-top:20px;font-size:12px;color:var(--ink2);display:flex;flex-wrap:w
       <button class="btn" id="themeBtn" aria-label="Alternar tema claro e escuro">Tema</button>
     </div>
   </div>
+
+  <details class="sobre" open>
+    <summary>Por que isso existe, como funciona e o que foi medido</summary>
+    <div class="sobre-corpo">
+      <h3>Por que isso existe</h3>
+      <p>Em operações industriais, cada ordem de produção deveria consumir os componentes previstos. Na prática, nem sempre isso acontece: a produção é apontada, mas o consumo não é baixado no sistema, por falta de saldo em estoque ou por problemas operacionais. Essas pendências afetam a logística, o custo do estoque e a visão real do que está em andamento.</p>
+      <p>O problema não é só a pendência, é a demora para enxergá-la. Separar as ordens que precisam de ação exige montar um recorte à mão, a partir de um relatório grande, e repetir isso para cada área. Quem precisa agir recebe o sinal tarde, quando a pendência já se acumulou.</p>
+
+      <h3>Como funciona</h3>
+      <ol>
+        <li>A base de ordens fica em uma planilha do Google Sheets, com a pendência calculada por fórmula.</li>
+        <li>n8n ou Make leem as ordens, filtram as pendentes, agregam o total e gravam uma linha de resumo. Só um deles fica ativo por vez.</li>
+        <li>O Zapier detecta a linha nova e envia o e-mail com o total, a soma e os cinco componentes que mais pesam, com link para esta página.</li>
+        <li>Esta página lê a mesma base e permite filtrar por área, componente e situação.</li>
+      </ol>
+
+      <h3>O que foi medido (dados fictícios)</h3>
+      <ul>
+        <li><strong>Resultado de referência:</strong> 149 ordens com pendência, 7.981 unidades, mesmo top 5 em todas as camadas.</li>
+        <li><strong>Acerto:</strong> 4 de 4 linhas gravadas iguais à referência (3 pelo n8n, 1 pelo Make).</li>
+        <li><strong>Atraso até o e-mail:</strong> 2 medições, de 2 min 04 s e 2 min 21 s, no plano de teste do Zapier.</li>
+        <li><strong>Tempo do processo manual:</strong> cronometrado em 7 repetições, em 18/11/2026: 5 min com experiência e 10 min sem. Com 1 min de leitura do e-mail, o ganho é de 4 e 9 min por execução, com 2 execuções por dia útil.</li>
+      </ul>
+      <p class="sobre-links"><a href="https://github.com/Prodigyb0y/alerta-desvio-consumo" target="_blank" rel="noopener">Repositório com código, README e comparação das ferramentas</a></p>
+      <p class="sobre-nota">Todos os dados são fictícios. A empresa Gutenberg Systems existe só neste projeto.</p>
+    </div>
+  </details>
 
   <section class="filters" aria-label="Filtros do dashboard">
     <div class="f"><span class="lab">Área</span><div class="seg" id="fArea"></div></div>

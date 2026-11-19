@@ -77,7 +77,7 @@ E-mail recebido numa execução real (n8n):
 |---|---|---|
 | Acerto das linhas gravadas em `resumo` | 4 de 4 linhas atuais iguais à referência (149 pendentes, 7.981 un., mesmo top 5): 3 do n8n e 1 do Make | Comparação linha a linha com `scripts/calculo_referencia.py` |
 | E-mails disparados pelas linhas atuais | 3 de 4. A linha de 21:33 não disparou (ver Limitações) | Conferência da caixa de teste contra a aba `resumo` |
-| Atraso entre a linha gravada e o e-mail | 2 medições: cerca de 2 min 04 s e 2 min 21 s | Horário gravado na linha de `resumo` vs. horário da execução no histórico do Zapier |
+| Atraso entre a linha gravada e o e-mail | 2 medições: cerca de 2 min 04 s e 2 min 21 s, no plano de teste do Zapier (no gratuito, o gatilho pode levar até 15 min) | Horário gravado na linha de `resumo` vs. horário da execução no histórico do Zapier |
 | Execuções do cenário Make | 7 no histórico: 6 com sucesso e 1 com erro, já corrigido (chave `{empty}` no mapeamento do top 5) | Histórico de execuções do Make |
 | Duração de cada execução do Make | 0,4 s a 1,1 s | Duração registrada no histórico do Make |
 | Tempo do processo manual | Não medido. Há apenas uma estimativa do autor, de 3 a 10 minutos por pessoa | Não se aplica |
@@ -122,7 +122,7 @@ Detalhes da cronometragem e pendências em [`docs/resultados.md`](docs/resultado
 
 ## Limitações
 
-- **Planos gratuitos:** Make com 1.000 créditos/mês; Zapier desenhado para 100 tarefas/mês e Zaps de duas etapas (o gatilho pode levar até 15 min); n8n Cloud em teste de 14 dias, por isso o fluxo está exportado em `n8n/workflow.json`. Detalhes em [`docs/planos.md`](docs/planos.md).
+- **Planos gratuitos:** Make com 1.000 créditos/mês; Zapier desenhado para 100 tarefas/mês e Zaps de duas etapas (o gatilho pode levar até 15 min); n8n Cloud em teste de 14 dias, por isso o fluxo está exportado em `n8n/workflow.json`. Comparação das ferramentas em [`docs/comparacao.md`](docs/comparacao.md). Detalhes em [`docs/planos.md`](docs/planos.md).
 - **Gatilho manual:** não há agendamento. Em produção, bastaria um agendamento diário.
 - **Aba `resumo`:** ao apagar linhas dela, desligue e ligue o Zap, senão a próxima linha nova pode não disparar o e-mail (ver [`zapier/README.md`](zapier/README.md)).
 - **Amostra pequena:** 4 linhas em `resumo` e 2 medições de atraso. Os números acima servem para validar o fluxo, não para estimar desempenho.
