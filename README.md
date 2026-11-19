@@ -7,6 +7,8 @@ Fluxo ponta a ponta que detecta ordens de produção com consumo abaixo do neces
 - **Demo do dashboard (sem instalação):** https://prodigyb0y.github.io/alerta-desvio-consumo/
 - **Repositório:** https://github.com/Prodigyb0y/alerta-desvio-consumo
 
+![Dashboard publicado no GitHub Pages](docs/img/dashboard.png)
+
 ## Como funciona
 
 ```
