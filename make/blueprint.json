@@ -104,7 +104,7 @@
           "1": "MAKE",
           "2": "{{length(3.array)}}",
           "3": "{{sum(map(3.array; 7))}}",
-          "4": "{{join(map(slice(reverse(sort(5.array; \"soma\")); 0; 5); \"texto\"); \"\\n\")}}",
+          "4": "{{join(map(slice(reverse(sort(5.array; \"soma\")); 0; 5); \"texto\"); newline)}}",
           "5": "https://prodigyb0y.github.io/alerta-desvio-consumo/"
         }
       }
