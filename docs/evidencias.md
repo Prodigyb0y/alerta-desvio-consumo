@@ -28,6 +28,8 @@ Planos conferidos nos painéis de Make, Zapier e n8n. Detalhes em [`planos.md`](
 - Correção feita no caminho: o filtro tinha sido salvo com o texto `qtd_pendente_calc` e operador de tempo, e por isso não bloqueava nenhuma linha. Foi refeito com a coluna H e operador numérico.
 - `make/blueprint.json` foi montado a partir da configuração aplicada no cenário e pode diferir em metadados do que o botão "Export Blueprint" gera.
 
+- Histórico do cenário no Make (conferido em 18/11/2026, à noite): 7 execuções no total, 6 com sucesso e 1 com erro (`DataError` no mapeamento do top 5, corrigido). Além disso, houve 3 execuções de 2 operações (20:39, 20:40 e 20:43, horário de Brasília) feitas durante os ajustes do filtro. Elas não estão registradas nesta página e não foram analisadas uma a uma; a aba `resumo` foi limpa depois.
+
 ## Fase 5: notificação com Zapier (18/11/2026)
 - Zap de duas etapas (Google Sheets "New Spreadsheet Row" em `resumo` → Gmail "Send Email" para o endereço de teste). Detalhes em [`zapier/README.md`](../zapier/README.md). O Zapier não agrega nada.
 - Execução real: o n8n gravou a linha `18/11/2026 21:04:28 | N8N | 149 | 7981` e o Zap rodou às 21:06:32 (histórico do Zapier: Successful, 1 tarefa), enviando o e-mail `[N8N] Alerta de desvio de consumo: 149 ordens com pendência`.
