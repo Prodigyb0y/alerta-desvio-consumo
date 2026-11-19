@@ -80,7 +80,7 @@ E-mail recebido numa execução real (n8n):
 | Atraso entre a linha gravada e o e-mail | 2 medições: cerca de 2 min 04 s e 2 min 21 s, no plano de teste do Zapier (no gratuito, o gatilho pode levar até 15 min) | Horário gravado na linha de `resumo` vs. horário da execução no histórico do Zapier |
 | Execuções do cenário Make | 7 no histórico: 6 com sucesso e 1 com erro, já corrigido (chave `{empty}` no mapeamento do top 5) | Histórico de execuções do Make |
 | Duração de cada execução do Make | 0,4 s a 1,1 s | Duração registrada no histórico do Make |
-| Tempo do processo manual | Não medido. Há apenas uma estimativa do autor, de 3 a 10 minutos por pessoa | Não se aplica |
+| Tempo do processo manual | 5 min com experiência e 10 min sem experiência específica, por execução. Ganho de 4 e 9 min por execução, com leitura de 1 min do e-mail | Cronometragem do autor, 7 repetições em 18/11/2026, com a base fictícia |
 
 ### Ganho de tempo (processo manual cronometrado pelo autor)
 
