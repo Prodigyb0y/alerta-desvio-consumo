@@ -14,7 +14,7 @@ Em operações industriais, cada ordem de produção deveria consumir os compone
 
 O problema não é só a pendência, é a demora para enxergá-la. Separar as ordens que precisam de ação exige montar um recorte à mão, a partir de um relatório grande, com muita informação além das ordens, e repetir isso para cada área. Quem precisa agir, como programação e planejamento, recebe o sinal tarde, quando a pendência já se acumulou.
 
-Este projeto recria essa rotina com dados fictícios. Ele calcula as pendências sozinho, avisa as equipes com o total e os componentes que mais pesam, e disponibiliza um dashboard para ver tudo em detalhe, para que a atenção vá primeiro para as ordens mais problemáticas. No modelo de produção, o aviso sai no início do dia; na demo, o disparo é manual.
+Este projeto recria essa rotina com dados fictícios. Ele calcula as pendências sozinho, avisa as equipes com o total e os componentes que mais pesam, e disponibiliza um dashboard para ver tudo em detalhe, para que a atenção vá primeiro para as ordens mais problemáticas. No modelo de produção, o aviso sai duas vezes por dia útil; na demo, o disparo é manual.
 
 *Recriação conceitual de uma experiência real. Nenhum dado, nome de sistema ou informação da empresa de origem aparece aqui.*
 
@@ -84,15 +84,16 @@ E-mail recebido numa execução real (n8n):
 
 ### Ganho estimado de tempo (estimativa, não medida)
 
-| Período | Dias úteis | Com 3 min por dia | Com 10 min por dia |
-|---|---|---|---|
-| Semana | 5 | 15 min (0,25 h) | 50 min (0,83 h) |
-| Mês | 22 | 66 min (1,1 h) | 220 min (3,7 h) |
-| Ano | 260 | 780 min (13 h) | 2.600 min (43,3 h) |
+| Período | Dias úteis | Execuções | Com 5 min por execução | Com 10 min por execução |
+|---|---|---|---|---|
+| Semana | 5 | 10 | 50 min (0,83 h) | 100 min (1,67 h) |
+| Mês | 22 | 44 | 220 min (3,67 h) | 440 min (7,33 h) |
+| Ano | 260 | 520 | 2.600 min (43,3 h) | 5.200 min (86,7 h) |
 
 **Método:** horas ganhas = minutos do processo manual por execução × execuções no período ÷ 60.
-**Premissas:** 1 execução por dia útil, 1 pessoa fazendo o processo, 22 dias úteis por mês e 260 por ano. Os 3 e 10 minutos vêm da estimativa do autor, não de cronometragem. O tempo de leitura do e-mail não foi descontado, porque não foi medido.
-**Como transformar em medição:** cronometrar o processo manual três vezes, registrar em `docs/resultados.md` e substituir os valores da tabela. Na demo o disparo é manual, então o ganho acima vale para o modelo de produção, em que o fluxo roda todo dia.
+**Premissas:** 2 execuções por dia útil; 1 pessoa. O processo manual inclui abrir o arquivo de ordens, filtrar as ordens com consumo negativo, filtrar por área, exportar e, às vezes, montar um gráfico. Os 5 minutos são a estimativa para quem tem prática; 10 minutos, para quem não tem. O tempo de leitura do e-mail não foi descontado, porque não foi medido.
+**Fora do cálculo:** o ganho de visualização do dashboard. Ele facilita a leitura, mas não tem um tempo associado.
+**Como transformar em medição:** cronometrar o processo manual três vezes com a base fictícia, registrar em `docs/resultados.md` e substituir os valores da tabela.
 
 **Por que isso importa para um time de negócio:** em vez de montar o recorte à mão, quem acompanha os desvios recebe, a cada execução, o total de ordens com consumo abaixo do necessário, o volume pendente e os componentes que mais pesam, com link para o dashboard.
 
