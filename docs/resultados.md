@@ -13,9 +13,9 @@
 Resultados: 2,9 h por mês e 34,7 h por ano com profissional experiente; 6,6 h por mês e 78 h por ano sem experiência específica.
 
 **Registro da cronometragem:**
-- Dados usados: base fictícia do projeto. Os tempos são do processo recriado, não do processo real; por isso não é possível atribuí-los à empresa de origem.
-- Repetições: entre 3 e 10. O número exato ainda não foi registrado.
-- Data da cronometragem: a confirmar.
+- Dados usados: base fictícia do projeto. Os tempos são do processo recriado, não do processo real; por isso não podem ser atribuídos à empresa de origem.
+- Repetições: 7.
+- Data: 18/11/2026.
 - Ganho do dashboard: qualitativo, sem medição de tempo.
 
 ## Demais medições
