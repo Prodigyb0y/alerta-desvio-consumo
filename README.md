@@ -6,7 +6,7 @@ Fluxo ponta a ponta que detecta ordens de produção com consumo abaixo do neces
 
 - **Demo do dashboard (sem instalação):** https://prodigyb0y.github.io/alerta-desvio-consumo/
 
-![Dashboard publicado no GitHub Pages](docs/img/dashboard.png)
+![Dashboard da Gutenberg Systems no GitHub Pages: barra lateral com filtros, cinco indicadores, matriz componente × área, pendência por área e faixas de pendência](docs/img/dashboard.png)
 
 ## Por que isso existe
 

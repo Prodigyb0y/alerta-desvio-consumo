@@ -55,4 +55,4 @@ Planos conferidos nos painéis de Make, Zapier e n8n. Detalhes em [`planos.md`](
 - **Teclado:** todos os controles têm foco visível; a matriz tem muitas paradas de Tab, por isso há o atalho "Pular para a tabela de ordens" (conferido: o foco vai para a tabela).
 - **Árvore de acessibilidade** conferida no Chromium (títulos, nomes dos controles, estado dos filtros). **Não** foi testado com leitor de tela real (NVDA, VoiceOver) nem com pessoas.
 - **Daltonismo:** simulação de deuteranopia e protanopia sobre a captura da página; a paleta de um matiz e os números escritos mantêm a leitura. Sem teste com pessoas.
-- A captura `docs/img/dashboard.png` foi substituída pela da nova versão. Foi tirada com o CSV do repositório servido no lugar da planilha, que tem os mesmos totais.
+- A captura `docs/img/dashboard.png` foi substituída pela da versão final (card "Ordens com excedente" incluído). Foi tirada com o CSV do repositório servido no lugar da planilha, que tem os mesmos totais, e o texto alternativo da imagem no README descreve o conteúdo da tela.
